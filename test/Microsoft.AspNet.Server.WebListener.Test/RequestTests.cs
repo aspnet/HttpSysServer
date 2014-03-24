@@ -150,21 +150,15 @@ namespace Microsoft.AspNet.Server.WebListener.Test
 
         private IDisposable CreateServer(AppFunc app)
         {
-            ServerFactory factory = new ServerFactory();
-            IServerConfiguration config = factory.CreateConfiguration();
+            var factory = new ServerFactory(loggerFactory: null);
+            var serverInfo = (ServerInformation)factory.Initialize(configuration: null);
 
             foreach (string path in new[] { "/", "/11", "/2/3", "/2", "/11/2" })
             {
-                IDictionary<string, object> address = new Dictionary<string, object>();
-                address["scheme"] = "http";
-                address["host"] = "localhost";
-                address["port"] = "8080";
-                address["path"] = path;
-
-                config.Addresses.Add(address);
+                serverInfo.Listener.UrlPrefixes.Add(UrlPrefix.Create("http", "localhost", "8080", path));
             }
 
-            return factory.Start(config, app);
+            return factory.Start(serverInfo, app);
         }
 
         private async Task<string> SendRequestAsync(string uri)

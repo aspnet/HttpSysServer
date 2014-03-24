@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Abstractions;
 using Microsoft.AspNet.Hosting.Server;
 
 namespace Microsoft.AspNet.Server.WebListener.Test
@@ -31,20 +32,12 @@ namespace Microsoft.AspNet.Server.WebListener.Test
 
         internal static IDisposable CreateServer(string scheme, string host, string port, string path, AuthenticationType authType, AppFunc app)
         {
-            IDictionary<string, object> address = new Dictionary<string, object>();
-            address["scheme"] = scheme;
-            address["host"] = host;
-            address["port"] = port;
-            address["path"] = path;
+            var factory = new ServerFactory(loggerFactory: null);
+            var serverInfo = (ServerInformation)factory.Initialize(configuration: null);
+            serverInfo.Listener.UrlPrefixes.Add(UrlPrefix.Create(scheme, host, port, path));
+            serverInfo.Listener.AuthenticationManager.AuthenticationTypes = authType;
 
-            ServerFactory factory = new ServerFactory();
-            IServerConfiguration config = factory.CreateConfiguration();
-            config.Addresses.Add(address);
-
-            OwinWebListener listener = (OwinWebListener)config.AdvancedConfiguration;
-            listener.AuthenticationManager.AuthenticationTypes = authType;
-
-            return factory.Start(config, app);
+            return factory.Start(serverInfo, app);
         }
     }
 }

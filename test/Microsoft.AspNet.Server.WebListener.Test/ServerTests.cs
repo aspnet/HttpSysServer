@@ -116,7 +116,7 @@ namespace Microsoft.AspNet.Server.WebListener.Test
                     requestTasks.Add(requestTask);
                 }
 
-                bool success = Task.WaitAll(requestTasks.ToArray(), TimeSpan.FromSeconds(5));
+                bool success = Task.WaitAll(requestTasks.ToArray(), TimeSpan.FromSeconds(10));
                 if (!success)
                 {
                     Console.WriteLine();
@@ -191,20 +191,13 @@ namespace Microsoft.AspNet.Server.WebListener.Test
         [Fact]
         public async Task Server_SetQueueLimit_Success()
         {
-            IDictionary<string, object> address = new Dictionary<string, object>();
-            address["scheme"] = "http";
-            address["host"] = "localhost";
-            address["port"] = "8080";
-            address["path"] = string.Empty;
+            var factory = new ServerFactory(loggerFactory: null);
+            var serverInfo = (ServerInformation)factory.Initialize(configuration: null);
+            serverInfo.Listener.UrlPrefixes.Add(UrlPrefix.Create("http://localhost:8080"));
 
-            ServerFactory factory = new ServerFactory();
-            IServerConfiguration config = factory.CreateConfiguration();
-            config.Addresses.Add(address);
+            serverInfo.Listener.SetRequestQueueLimit(1001);
 
-            OwinWebListener listener = (OwinWebListener)config.AdvancedConfiguration;
-            listener.SetRequestQueueLimit(1001);
-
-            using (factory.Start(config, env => Task.FromResult(0)))
+            using (factory.Start(serverInfo, env => Task.FromResult(0)))
             {
                 string response = await SendRequestAsync(Address);
                 Assert.Equal(string.Empty, response);

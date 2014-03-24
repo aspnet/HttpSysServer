@@ -1,101 +1,86 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Logging;
 
 namespace Microsoft.AspNet.Server.WebListener
 {
     using AppFunc = Func<object, Task>;
-    using LoggerFactoryFunc = Func<string, Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>>;
-    using LoggerFunc = Func<TraceEventType, int, object, Exception, Func<object, Exception, string>, bool>;
-    using System.Threading;
 
-    public class WebListenerWrapper : IDisposable
+    internal class WebListenerWrapper : IDisposable
     {
         private static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
 
-        private OwinWebListener _listener;
-        private AppFunc _appFunc;
-        private LoggerFunc _logger;
+        private readonly OwinWebListener _listener;
+        private readonly ILogger _logger;
 
-        private PumpLimits _pumpLimits;
+        private AppFunc _appFunc;
+
+        private int _maxAccepts;
         private int _acceptorCounts;
         private Action<object> _processRequest;
 
         // TODO: private IDictionary<string, object> _capabilities;
 
-        internal WebListenerWrapper(OwinWebListener listener)
+        internal WebListenerWrapper(OwinWebListener listener, ILoggerFactory loggerFactory)
         {
             Contract.Assert(listener != null);
             _listener = listener;
+            _logger = LogHelper.CreateLogger(loggerFactory, typeof(WebListenerWrapper));
 
             _processRequest = new Action<object>(ProcessRequestAsync);
-            _pumpLimits = new PumpLimits(DefaultMaxAccepts);
+            _maxAccepts = DefaultMaxAccepts;
         }
 
-        internal void Start(AppFunc app, IList<IDictionary<string, object>> addresses,  LoggerFactoryFunc loggerFactory)
+        internal OwinWebListener Listener
+        {
+            get { return _listener; }
+        }
+
+        internal int MaxAccepts
+        {
+            get
+            {
+                return _maxAccepts;
+            }
+            set
+            {
+                _maxAccepts = value;
+                if (_listener.IsListening)
+                {
+                    ActivateRequestProcessingLimits();
+                }
+            }
+        }
+
+        internal void Start(AppFunc app)
         {
             // Can't call Start twice
             Contract.Assert(_appFunc == null);
 
             Contract.Assert(app != null);
-            Contract.Assert(addresses != null);
 
             _appFunc = app;
-            _logger = LogHelper.CreateLogger(loggerFactory, typeof(WebListenerWrapper));
-            LogHelper.LogInfo(_logger, "Start");
 
-            foreach (var address in addresses)
+            if (_listener.UrlPrefixes.Count == 0)
             {
-                // Build addresses from parts
-                var scheme = address.Get<string>("scheme") ?? Constants.HttpScheme;
-                var host = address.Get<string>("host") ?? "localhost";
-                var port = address.Get<string>("port") ?? "5000";
-                var path = address.Get<string>("path") ?? string.Empty;
-
-                Prefix prefix = Prefix.Create(scheme, host, port, path);
-                _listener.UriPrefixes.Add(prefix);
+                throw new InvalidOperationException("No address prefixes were defined.");
             }
+
+            LogHelper.LogInfo(_logger, "Start");
 
             _listener.Start();
 
             ActivateRequestProcessingLimits();
         }
 
-        /// <summary>
-        /// These are merged as one operation because they should be swapped out atomically.
-        /// This controls how many requests the server attempts to process concurrently.
-        /// </summary>
-        /// <param name="maxAccepts">The maximum number of pending accepts.</param>
-        public void SetRequestProcessingLimits(int maxAccepts)
-        {
-            _pumpLimits = new PumpLimits(maxAccepts);
-
-            if (_listener.IsListening)
-            {
-                ActivateRequestProcessingLimits();
-            }
-        }
-
         private void ActivateRequestProcessingLimits()
         {
-            for (int i = _acceptorCounts; i < _pumpLimits.MaxOutstandingAccepts; i++)
+            for (int i = _acceptorCounts; i < MaxAccepts; i++)
             {
                 ProcessRequestsWorker();
             }
-        }
-
-        /// <summary>
-        /// Gets the request processing limits.
-        /// </summary>
-        /// <param name="maxAccepts">The maximum number of pending accepts.</param>
-        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId = "0#", Justification = "By design")]
-        public void GetRequestProcessingLimits(out int maxAccepts)
-        {
-            PumpLimits limits = _pumpLimits;
-            maxAccepts = limits.MaxOutstandingAccepts;
         }
 
         // The message pump.
@@ -105,7 +90,7 @@ namespace Microsoft.AspNet.Server.WebListener
         private async void ProcessRequestsWorker()
         {
             int workerIndex = Interlocked.Increment(ref _acceptorCounts);
-            while (_listener.IsListening && workerIndex <= _pumpLimits.MaxOutstandingAccepts)
+            while (_listener.IsListening && workerIndex <= MaxAccepts)
             {
                 // Receive a request
                 RequestContext requestContext;
