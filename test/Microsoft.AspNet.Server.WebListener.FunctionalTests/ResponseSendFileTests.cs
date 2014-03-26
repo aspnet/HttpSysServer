@@ -1,8 +1,4 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="ResponseSendFileTests.cs" company="Microsoft">
-//      Copyright (c) Microsoft Corporation.  All rights reserved.
-// </copyright>
-// -----------------------------------------------------------------------
+﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -18,17 +14,22 @@ using Microsoft.AspNet.HttpFeature;
 using Microsoft.AspNet.PipelineCore;
 using Xunit;
 
-namespace Microsoft.AspNet.Server.WebListener.Test
+namespace Microsoft.AspNet.Server.WebListener
 {
-    using AppFunc = Func<object, Task>;
-
     public class ResponseSendFileTests
     {
         private const string Address = "http://localhost:8080/";
-        private static readonly string AbsoluteFilePath = Environment.CurrentDirectory + "\\Microsoft.AspNet.Server.WebListener.dll";
-        private static readonly string RelativeFilePath = "Microsoft.AspNet.Server.WebListener.dll";
-        private static readonly long FileLength = new FileInfo(AbsoluteFilePath).Length;
+        private readonly string AbsoluteFilePath;
+        private readonly string RelativeFilePath;
+        private readonly long FileLength;
         
+        public ResponseSendFileTests()
+        {
+            AbsoluteFilePath = Directory.GetFiles(Environment.CurrentDirectory).First();
+            RelativeFilePath = Path.GetFileName(AbsoluteFilePath);
+            FileLength = new FileInfo(AbsoluteFilePath).Length;
+        }
+
         [Fact]
         public async Task ResponseSendFile_SupportKeys_Present()
         {
