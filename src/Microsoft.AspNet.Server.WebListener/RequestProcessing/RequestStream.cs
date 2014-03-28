@@ -165,7 +165,8 @@ namespace Microsoft.AspNet.Server.WebListener
 
         private void UpdateAfterRead(uint statusCode, uint dataRead)
         {
-            if (statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_HANDLE_EOF || dataRead == 0)
+            // Don't auto-dispose until Read/Async returns 0.
+            if (/*statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_HANDLE_EOF ||*/ dataRead == 0)
             {
                 Dispose();
             }
