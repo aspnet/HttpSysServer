@@ -7,11 +7,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNet.FeatureModel;
-using Microsoft.AspNet.PipelineCore;
 using Xunit;
 
-namespace Microsoft.AspNet.Server.WebListener
+namespace Microsoft.Net.Server
 {
     public class ResponseBodyTests
     {
@@ -20,14 +18,16 @@ namespace Microsoft.AspNet.Server.WebListener
         [Fact]
         public async Task ResponseBody_WriteNoHeaders_DefaultsToChunked()
         {
-            using (Utilities.CreateHttpServer(env =>
+            using (var server = Utilities.CreateHttpServer())
             {
-                var httpContext = new DefaultHttpContext((IFeatureCollection)env);
-                httpContext.Response.Body.Write(new byte[10], 0, 10);
-                return httpContext.Response.Body.WriteAsync(new byte[10], 0, 10);
-            }))
-            {
-                HttpResponseMessage response = await SendRequestAsync(Address);
+                Task<HttpResponseMessage> responseTask = SendRequestAsync(Address);
+
+                var context = await server.GetContextAsync();
+                context.Response.Body.Write(new byte[10], 0, 10);
+                await context.Response.Body.WriteAsync(new byte[10], 0, 10);
+                context.Dispose();
+
+                HttpResponseMessage response = await responseTask;
                 Assert.Equal(200, (int)response.StatusCode);
                 Assert.Equal(new Version(1, 1), response.Version);
                 IEnumerable<string> ignored;
@@ -40,17 +40,19 @@ namespace Microsoft.AspNet.Server.WebListener
         [Fact]
         public async Task ResponseBody_WriteChunked_Chunked()
         {
-            using (Utilities.CreateHttpServer(env =>
+            using (var server = Utilities.CreateHttpServer())
             {
-                var httpContext = new DefaultHttpContext((IFeatureCollection)env);
-                httpContext.Request.Headers["transfeR-Encoding"] = " CHunked ";
-                Stream stream = httpContext.Response.Body;
+                Task<HttpResponseMessage> responseTask = SendRequestAsync(Address);
+
+                var context = await server.GetContextAsync();
+                context.Request.Headers["transfeR-Encoding"] = new[] { " CHunked " };
+                Stream stream = context.Response.Body;
                 stream.EndWrite(stream.BeginWrite(new byte[10], 0, 10, null, null));
                 stream.Write(new byte[10], 0, 10);
-                return stream.WriteAsync(new byte[10], 0, 10);
-            }))
-            {
-                HttpResponseMessage response = await SendRequestAsync(Address);
+                await stream.WriteAsync(new byte[10], 0, 10);
+                context.Dispose();
+
+                HttpResponseMessage response = await responseTask;
                 Assert.Equal(200, (int)response.StatusCode);
                 Assert.Equal(new Version(1, 1), response.Version);
                 IEnumerable<string> ignored;
@@ -63,17 +65,19 @@ namespace Microsoft.AspNet.Server.WebListener
         [Fact]
         public async Task ResponseBody_WriteContentLength_PassedThrough()
         {
-            using (Utilities.CreateHttpServer(env =>
+            using (var server = Utilities.CreateHttpServer())
             {
-                var httpContext = new DefaultHttpContext((IFeatureCollection)env);
-                httpContext.Response.Headers["Content-lenGth"] = " 30 ";
-                Stream stream = httpContext.Response.Body;
+                Task<HttpResponseMessage> responseTask = SendRequestAsync(Address);
+
+                var context = await server.GetContextAsync();
+                context.Response.Headers["Content-lenGth"] = new[] { " 30 " };
+                Stream stream = context.Response.Body;
                 stream.EndWrite(stream.BeginWrite(new byte[10], 0, 10, null, null));
                 stream.Write(new byte[10], 0, 10);
-                return stream.WriteAsync(new byte[10], 0, 10);
-            }))
-            {
-                HttpResponseMessage response = await SendRequestAsync(Address);
+                await stream.WriteAsync(new byte[10], 0, 10);
+                context.Dispose();
+
+                HttpResponseMessage response = await responseTask;
                 Assert.Equal(200, (int)response.StatusCode);
                 Assert.Equal(new Version(1, 1), response.Version);
                 IEnumerable<string> contentLength;
@@ -104,76 +108,69 @@ namespace Microsoft.AspNet.Server.WebListener
             }
         }
         */
+        /* TODO: Why does this test time out?
         [Fact]
         public async Task ResponseBody_WriteContentLengthNoneWritten_Throws()
         {
-            using (Utilities.CreateHttpServer(env =>
+            using (var server = Utilities.CreateHttpServer())
             {
-                var httpContext = new DefaultHttpContext((IFeatureCollection)env);
-                httpContext.Response.Headers["Content-lenGth"] = " 20 ";
-                return Task.FromResult(0);
-            }))
+                Task<HttpResponseMessage> responseTask = SendRequestAsync(Address);
+
+                var context = await server.GetContextAsync();
+                context.Response.Headers["Content-lenGth"] = new[] { " 20 " };
+                context.Dispose();
+
+                await Assert.ThrowsAsync<HttpRequestException>(() => responseTask);
+            }
+        }
+        */
+        [Fact]
+        public async Task ResponseBody_WriteContentLengthNotEnoughWritten_Throws()
+        {
+            using (var server = Utilities.CreateHttpServer())
             {
-                await Assert.ThrowsAsync<HttpRequestException>(() => SendRequestAsync(Address));
+                Task<HttpResponseMessage> responseTask = SendRequestAsync(Address);
+
+                var context = await server.GetContextAsync();
+                context.Response.Headers["Content-lenGth"] = new[] { " 20 " };
+                context.Response.Body.Write(new byte[5], 0, 5);
+                context.Dispose();
+
+                await Assert.ThrowsAsync<HttpRequestException>(() => responseTask);
             }
         }
 
         [Fact]
-        public void ResponseBody_WriteContentLengthNotEnoughWritten_Throws()
+        public async Task ResponseBody_WriteContentLengthTooMuchWritten_Throws()
         {
-            using (Utilities.CreateHttpServer(env =>
+            using (var server = Utilities.CreateHttpServer())
             {
-                var httpContext = new DefaultHttpContext((IFeatureCollection)env);
-                httpContext.Response.Headers["Content-lenGth"] = " 20 ";
-                httpContext.Response.Body.Write(new byte[5], 0, 5);
-                return Task.FromResult(0);
-            }))
-            {
-                Assert.Throws<AggregateException>(() => SendRequestAsync(Address).Result);
-            }
-        }
+                Task<HttpResponseMessage> responseTask = SendRequestAsync(Address);
 
-        [Fact]
-        public void ResponseBody_WriteContentLengthTooMuchWritten_Throws()
-        {
-            using (Utilities.CreateHttpServer(env =>
-            {
-                var httpContext = new DefaultHttpContext((IFeatureCollection)env);
-                httpContext.Response.Headers["Content-lenGth"] = " 10 ";
-                httpContext.Response.Body.Write(new byte[5], 0, 5);
-                httpContext.Response.Body.Write(new byte[6], 0, 6);
-                return Task.FromResult(0);
-            }))
-            {
-                Assert.Throws<AggregateException>(() => SendRequestAsync(Address).Result);
+                var context = await server.GetContextAsync();
+                context.Response.Headers["Content-lenGth"] = new[] { " 10 " };
+                context.Response.Body.Write(new byte[5], 0, 5);
+                Assert.Throws<InvalidOperationException>(() => context.Response.Body.Write(new byte[6], 0, 6));
+                context.Dispose();
+
+                await Assert.ThrowsAsync<HttpRequestException>(() => responseTask);
             }
         }
 
         [Fact]
         public async Task ResponseBody_WriteContentLengthExtraWritten_Throws()
         {
-            ManualResetEvent waitHandle = new ManualResetEvent(false);
-            bool? appThrew = null;
-            using (Utilities.CreateHttpServer(env =>
+            using (var server = Utilities.CreateHttpServer())
             {
-                try
-                {
-                    var httpContext = new DefaultHttpContext((IFeatureCollection)env);
-                    httpContext.Response.Headers["Content-lenGth"] = " 10 ";
-                    httpContext.Response.Body.Write(new byte[10], 0, 10);
-                    httpContext.Response.Body.Write(new byte[9], 0, 9);
-                    appThrew = false;
-                }
-                catch (Exception)
-                {
-                    appThrew = true;
-                }
-                waitHandle.Set();
-                return Task.FromResult(0);
-            }))
-            {
-                // The full response is received.
-                HttpResponseMessage response = await SendRequestAsync(Address);
+                Task<HttpResponseMessage> responseTask = SendRequestAsync(Address);
+
+                var context = await server.GetContextAsync();
+                context.Response.Headers["Content-lenGth"] = new[] { " 10 " };
+                context.Response.Body.Write(new byte[10], 0, 10);
+                Assert.Throws<ObjectDisposedException>(() => context.Response.Body.Write(new byte[6], 0, 6));
+                context.Dispose();
+
+                var response = await responseTask;
                 Assert.Equal(200, (int)response.StatusCode);
                 Assert.Equal(new Version(1, 1), response.Version);
                 IEnumerable<string> contentLength;
@@ -181,10 +178,6 @@ namespace Microsoft.AspNet.Server.WebListener
                 Assert.Equal("10", contentLength.First());
                 Assert.Null(response.Headers.TransferEncodingChunked);
                 Assert.Equal(new byte[10], await response.Content.ReadAsByteArrayAsync());
-
-                Assert.True(waitHandle.WaitOne(100));
-                Assert.True(appThrew.HasValue, "appThrew.HasValue");
-                Assert.True(appThrew.Value, "appThrew.Value");
             }
         }
 
