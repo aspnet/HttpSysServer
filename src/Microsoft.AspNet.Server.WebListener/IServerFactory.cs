@@ -16,18 +16,17 @@
 // permissions and limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Builder;
+using Microsoft.Framework.ConfigurationModel;
+using Microsoft.Framework.Runtime;
 
-namespace Microsoft.Net.Server
+namespace Microsoft.AspNet.Hosting.Server
 {
-    [Flags]
-    public enum AuthenticationTypes
+    [AssemblyNeutral]
+    public interface IServerFactory
     {
-        None = 0x0,
-        Basic = 0x1,
-        // Digest = 0x2, // TODO: Verify this is no longer supported by Http.Sys
-        NTLM = 0x4,
-        Negotiate = 0x8,
-        Kerberos = 0x10,
-        AllowAnonymous = 0x1000
+        IServerInformation Initialize(IConfiguration configuration);
+        IDisposable Start(IServerInformation serverInformation, Func<object, Task> application);
     }
 }

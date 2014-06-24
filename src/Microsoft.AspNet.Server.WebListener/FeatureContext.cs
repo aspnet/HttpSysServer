@@ -20,11 +20,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.WebSockets;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.FeatureModel;
 using Microsoft.AspNet.HttpFeature;
+using Microsoft.AspNet.HttpFeature.Security;
 using Microsoft.Net.Server;
 using Microsoft.Net.WebSockets;
 
@@ -38,6 +41,7 @@ namespace Microsoft.AspNet.Server.WebListener
         IHttpClientCertificateFeature,
         IHttpRequestLifetimeFeature,
         IHttpWebSocketFeature,
+        IHttpAuthenticationFeature,
         IHttpOpaqueUpgradeFeature
     {
         private RequestContext _requestContext;
@@ -57,6 +61,8 @@ namespace Microsoft.AspNet.Server.WebListener
         private int? _localPort;
         private bool? _isLocal;
         private X509Certificate _clientCert;
+        private ClaimsPrincipal _user;
+        private IAuthenticationHandler _authHandler;
         private Stream _responseStream;
         private IDictionary<string, string[]> _responseHeaders;
 
@@ -64,6 +70,7 @@ namespace Microsoft.AspNet.Server.WebListener
         {
             _requestContext = requestContext;
             _features = new FeatureCollection();
+            _authHandler = new AuthenticationHandler(requestContext);
             PopulateFeatures();
         }
 
@@ -94,6 +101,7 @@ namespace Microsoft.AspNet.Server.WebListener
             _features.Add(typeof(IHttpResponseFeature), this);
             _features.Add(typeof(IHttpSendFileFeature), this);
             _features.Add(typeof(IHttpRequestLifetimeFeature), this);
+            _features.Add(typeof(IHttpAuthenticationFeature), this);
 
             // Win8+
             if (WebSocketHelpers.AreWebSocketsSupported)
@@ -102,14 +110,11 @@ namespace Microsoft.AspNet.Server.WebListener
                 _features.Add(typeof(IHttpWebSocketFeature), this);
             }
 
-            // TODO: 
-            // _environment.CallCancelled = _cts.Token;
-            // _environment.User = _request.User;
-            // Channel binding
-
+            // TODO:
             /*
-            // Server
+            Server
             _environment.Listener = _server;
+            Channel binding
             _environment.ConnectionId = _request.ConnectionId;            
              */
         }
@@ -402,6 +407,26 @@ namespace Microsoft.AspNet.Server.WebListener
                 subProtocol = context.SubProtocol;
             }
             return _requestContext.AcceptWebSocketAsync(subProtocol);
+        }
+
+        ClaimsPrincipal IHttpAuthenticationFeature.User
+        {
+            get
+            {
+                if (_user == null)
+                {
+                    _user = _requestContext.User;
+                }
+                return _user;
+            }
+            set { _user = value; }
+        }
+
+        // TODO: Hook this server up as the default handler, have it issue challenges for configured auth types by name.
+        IAuthenticationHandler IHttpAuthenticationFeature.Handler
+        {
+            get { return _authHandler; }
+            set { _authHandler = value; }
         }
     }
 }

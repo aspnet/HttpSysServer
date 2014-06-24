@@ -2,7 +2,6 @@
   "version": "1.0.0-*",
   "dependencies": {
     "Microsoft.AspNet.FeatureModel": "1.0.0-*",
-    "Microsoft.AspNet.Hosting": "1.0.0-*",
     "Microsoft.AspNet.Http": "1.0.0-*",
     "Microsoft.AspNet.HttpFeature": "1.0.0-*",
     "Microsoft.Framework.ConfigurationModel": "1.0.0-*",
@@ -33,6 +32,7 @@
         "System.Runtime.Extensions": "4.0.10.0",
         "System.Runtime.Handles":  "4.0.0.0",
         "System.Runtime.InteropServices": "4.0.20.0",
+        "System.Security.Claims": "1.0.0-*",
         "System.Security.Cryptography.X509Certificates": "4.0.0.0",
         "System.Security.Principal": "4.0.0.0",
         "System.Text.Encoding": "4.0.20.0",
