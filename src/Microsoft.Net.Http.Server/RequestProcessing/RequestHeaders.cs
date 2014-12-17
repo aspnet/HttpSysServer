@@ -56,12 +56,7 @@ namespace Microsoft.Net.Http.Server
         {
             get
             {
-                if (_extra == null)
-                {
-                    var newDict = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
-                    GetUnknownHeaders(newDict);
-                    Interlocked.CompareExchange(ref _extra, newDict, null);
-                }
+                PopulateExtra();
                 return _extra;
             }
         }
@@ -80,6 +75,22 @@ namespace Microsoft.Net.Http.Server
                     Extra[key] = value;
                 }
             }
+        }
+
+        private void PopulateExtra()
+        {
+            if (_extra == null)
+            {
+                var newDict = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
+                GetUnknownHeaders(newDict);
+                Interlocked.CompareExchange(ref _extra, newDict, null);
+            }
+        }
+
+        public void CompleteMarshalling()
+        {
+            PopulateAllKnownHeaders();
+            PopulateExtra();
         }
 
         private string GetKnownHeader(HttpSysRequestHeader header)

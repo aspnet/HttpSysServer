@@ -126,6 +126,8 @@ namespace Microsoft.Net.Http.Server
                 Debug.Assert(!disposing, "AsyncRequestContext::Dispose()|Must call ReleasePins() before calling Dispose().");
                 _nativeOverlapped.Dispose();
             }
+
+            _backingBuffer = null;
         }
 
         private void SetBlob(UnsafeNclNativeMethods.HttpApi.HTTP_REQUEST* requestBlob)

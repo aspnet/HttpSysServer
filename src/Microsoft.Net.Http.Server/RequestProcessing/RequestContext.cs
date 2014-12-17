@@ -42,7 +42,6 @@ namespace Microsoft.Net.Http.Server
         private WebListener _server;
         private Request _request;
         private Response _response;
-        private NativeRequestContext _memoryBlob;
         private bool _disposed;
         private CancellationTokenSource _requestAbortSource;
         private CancellationToken? _disconnectToken;
@@ -51,8 +50,7 @@ namespace Microsoft.Net.Http.Server
         {
             // TODO: Verbose log
             _server = server;
-            _memoryBlob = memoryBlob;
-            _request = new Request(this, _memoryBlob);
+            _request = new Request(this, memoryBlob);
             _response = new Response(this);
             _request.ReleasePins();
             AuthenticationChallenges = server.AuthenticationManager.AuthenticationTypes & ~AuthenticationTypes.AllowAnonymous;
@@ -153,10 +151,10 @@ namespace Microsoft.Net.Http.Server
             // Set the status code and reason phrase
             Response.StatusCode = (int)HttpStatusCode.SwitchingProtocols;
             Response.ReasonPhrase = HttpReasonPhrase.Get(HttpStatusCode.SwitchingProtocols);
-
             Response.SendOpaqueUpgrade(); // TODO: Async
             Request.SwitchToOpaqueMode();
             Response.SwitchToOpaqueMode();
+            Request.CompleteMarshalling();
             Stream opaqueStream = new OpaqueStream(Request.Body, Response.Body);
             return Task.FromResult(opaqueStream);
         }
