@@ -142,7 +142,7 @@ namespace Microsoft.Net.Http.Server
 
             if (_dataChunkIndex != -1)
             {
-                dataRead = UnsafeNclNativeMethods.HttpApi.GetChunks(_requestContext.Request.RequestBuffer, _requestContext.Request.OriginalBlobAddress, ref _dataChunkIndex, ref _dataChunkOffset, buffer, offset, size);
+                dataRead = GetChunks(buffer, offset, size);
             }
 
             if (_dataChunkIndex == -1 && dataRead < size)
@@ -218,7 +218,8 @@ namespace Microsoft.Net.Http.Server
             uint dataRead = 0;
             if (_dataChunkIndex != -1)
             {
-                dataRead = UnsafeNclNativeMethods.HttpApi.GetChunks(_requestContext.Request.RequestBuffer, _requestContext.Request.OriginalBlobAddress, ref _dataChunkIndex, ref _dataChunkOffset, buffer, offset, size);
+                dataRead = GetChunks(buffer, offset, size);
+
                 if (_dataChunkIndex != -1 && dataRead == size)
                 {
                     asyncResult = new RequestStreamAsyncResult(this, state, callback, buffer, offset, 0);
@@ -337,7 +338,8 @@ namespace Microsoft.Net.Http.Server
             uint dataRead = 0;
             if (_dataChunkIndex != -1)
             {
-                dataRead = UnsafeNclNativeMethods.HttpApi.GetChunks(_requestContext.Request.RequestBuffer, _requestContext.Request.OriginalBlobAddress, ref _dataChunkIndex, ref _dataChunkOffset, buffer, offset, size);
+                dataRead = GetChunks(buffer, offset, size);
+
                 if (_dataChunkIndex != -1 && dataRead == size)
                 {
                     UpdateAfterRead(UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS, dataRead);
@@ -345,7 +347,7 @@ namespace Microsoft.Net.Http.Server
                     return Task.FromResult<int>((int)dataRead);
                 }
             }
-            
+
             if (_dataChunkIndex == -1 && dataRead < size)
             {
                 uint statusCode = 0;
@@ -419,6 +421,25 @@ namespace Microsoft.Net.Http.Server
                 }
             }
             return asyncResult.Task;
+        }
+
+        private unsafe uint GetChunks(byte[] buffer, int offset, int size)
+        {
+            uint dataRead = 0;
+
+            var request = _requestContext.Request;
+            if (request.IsMarshallingCompleted)
+            {
+                // Currently we only mark marshelling complete for websocket upgrades
+                // Web sockets do not send early data chunks so we can just wrap things up
+                _dataChunkIndex = -1;
+            }
+            else
+            {
+                dataRead = UnsafeNclNativeMethods.HttpApi.GetChunks(request.RequestBuffer, request.OriginalBlobAddress, ref _dataChunkIndex, ref _dataChunkOffset, buffer, offset, size);
+            }
+
+            return dataRead;
         }
 
         public override void Write(byte[] buffer, int offset, int size)

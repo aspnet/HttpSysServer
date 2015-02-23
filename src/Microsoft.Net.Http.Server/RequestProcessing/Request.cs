@@ -23,7 +23,6 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Net;
@@ -61,6 +60,7 @@ namespace Microsoft.Net.Http.Server
 
         private X509Certificate _clientCert;
 
+        private RequestHeaders _headersImpl;
         private HeaderCollection _headers;
         private BoundaryType _contentBoundaryType;
         private long? _contentLength;
@@ -140,7 +140,8 @@ namespace Microsoft.Net.Http.Server
             }
 
             _httpMethod = UnsafeNclNativeMethods.HttpApi.GetVerb(RequestBuffer, OriginalBlobAddress);
-            _headers = new HeaderCollection(new RequestHeaders(_nativeRequestContext));
+            _headersImpl = new RequestHeaders(_nativeRequestContext);
+            _headers = new HeaderCollection(_headersImpl);
 
             UnsafeNclNativeMethods.HttpApi.HTTP_REQUEST_V2* requestV2 = (UnsafeNclNativeMethods.HttpApi.HTTP_REQUEST_V2*)memoryBlob.RequestBlob;
             _user = AuthenticationManager.GetUser(requestV2->pRequestInfo);
@@ -331,11 +332,7 @@ namespace Microsoft.Net.Http.Server
         {
             get
             {
-                if (_remoteEndPoint == null)
-                {
-                    _remoteEndPoint = UnsafeNclNativeMethods.HttpApi.GetRemoteEndPoint(RequestBuffer, OriginalBlobAddress);
-                }
-
+                PopulateRemoteEndpoint();
                 return _remoteEndPoint;
             }
         }
@@ -344,11 +341,7 @@ namespace Microsoft.Net.Http.Server
         {
             get
             {
-                if (_localEndPoint == null)
-                {
-                    _localEndPoint = UnsafeNclNativeMethods.HttpApi.GetLocalEndPoint(RequestBuffer, OriginalBlobAddress);
-                }
-
+                PopulateLocalEndpoint();
                 return _localEndPoint;
             }
         }
@@ -420,6 +413,11 @@ namespace Microsoft.Net.Http.Server
         internal ClaimsPrincipal User
         {
             get { return _user; }
+        }
+
+        internal bool IsMarshallingCompleted
+        {
+            get; private set;
         }
 
         internal UnsafeNclNativeMethods.HttpApi.HTTP_VERB GetKnownMethod()
@@ -506,11 +504,56 @@ namespace Microsoft.Net.Http.Server
             }
         }
 
+        internal void CompleteMarshalling()
+        {
+            if (_nativeRequestContext == null)
+            {
+                throw new InvalidOperationException("Native request context is already discarded. Cannot complete marshalling");
+            }
+
+            unsafe
+            {
+                fixed (byte* pMemoryBlob = _nativeRequestContext.RequestBuffer)
+                {
+                    UnsafeNclNativeMethods.HttpApi.HTTP_REQUEST* request = (UnsafeNclNativeMethods.HttpApi.HTTP_REQUEST*)pMemoryBlob;
+                    if (request->EntityChunkCount > 0)
+                    {
+                        throw new NotImplementedException("CompleteMarchalling currently only supports WebSocket case and should not contain entity chunk");
+                    }
+                }
+            }
+
+            // upgrade all pass-through fields so backing buffer can be freed
+            PopulateLocalEndpoint();
+            PopulateRemoteEndpoint();
+            _headersImpl.CompleteMarshalling();
+
+            _nativeRequestContext.Dispose();
+            _nativeRequestContext = null;
+            IsMarshallingCompleted = true;
+        }
+
         internal void SwitchToOpaqueMode()
         {
             if (_nativeStream == null || _nativeStream == Stream.Null)
             {
                 _nativeStream = new RequestStream(RequestContext);
+            }
+        }
+
+        private void PopulateRemoteEndpoint()
+        {
+            if (_remoteEndPoint == null)
+            {
+                _remoteEndPoint = UnsafeNclNativeMethods.HttpApi.GetRemoteEndPoint(RequestBuffer, OriginalBlobAddress);
+            }
+        }
+
+        private void PopulateLocalEndpoint()
+        {
+            if (_localEndPoint == null)
+            {
+                _localEndPoint = UnsafeNclNativeMethods.HttpApi.GetLocalEndPoint(RequestBuffer, OriginalBlobAddress);
             }
         }
 

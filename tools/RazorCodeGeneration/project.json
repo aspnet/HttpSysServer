@@ -1,0 +1,22 @@
+﻿{
+    "version": "1.0.0-*",
+    "dependencies": {
+        "Microsoft.AspNet.Razor": "4.0.0-*",
+        "Microsoft.Framework.DependencyInjection": "1.0.0-*",
+        "Microsoft.Framework.CodeGeneration": "1.0.0-*",
+        "Microsoft.Framework.CodeGeneration.Common": { "version": "1.0.0-*", "type": "build" },
+        "Microsoft.Framework.CodeGeneration.Core": "1.0.0-*",
+        "Microsoft.Framework.CodeGeneration.Templating": "1.0.0-*"
+    },
+    "commands": {
+        "run" : "run"
+    },
+    "frameworks" : {
+        "aspnet50" : { },
+        "aspnetcore50" : {
+            "dependencies": {
+                "System.Console": "4.0.0-beta-*"
+            }
+        }
+    }
+}
