@@ -1,15 +1,15 @@
 {
-    "version": "1.0.0-*",
+    "version": "1.0.0-beta4",
     "description": "ASP.NET 5 self-host web server.",
     "dependencies": {
-        "Microsoft.AspNet.FeatureModel": "1.0.0-*",
-        "Microsoft.AspNet.Http": "1.0.0-*",
-        "Microsoft.AspNet.Http.Interfaces": "1.0.0-*",
-        "Microsoft.AspNet.Hosting.Interfaces": "1.0.0-*",
-        "Microsoft.Framework.ConfigurationModel": "1.0.0-*",
-        "Microsoft.Framework.Logging": "1.0.0-*",
-        "Microsoft.Net.Http.Server": "1.0.0-*",
-        "Microsoft.Net.WebSocketAbstractions": "1.0.0-*"
+        "Microsoft.AspNet.FeatureModel": "1.0.0-beta4",
+        "Microsoft.AspNet.Http": "1.0.0-beta4",
+        "Microsoft.AspNet.Http.Interfaces": "1.0.0-beta4",
+        "Microsoft.AspNet.Hosting.Interfaces": "1.0.0-beta4",
+        "Microsoft.Framework.ConfigurationModel": "1.0.0-beta4",
+        "Microsoft.Framework.Logging": "1.0.0-beta4",
+        "Microsoft.Net.Http.Server": "1.0.0-beta4",
+        "Microsoft.Net.WebSocketAbstractions": "1.0.0-beta4"
     },
     "compilationOptions": {
         "allowUnsafe": true

@@ -1,29 +1,29 @@
 {
-    "version": "1.0.0-*",
+    "version": "1.0.0-beta4",
     "description": "Implementation of WebSocket abstract base class. Used by WebListener.",
     "dependencies": {
-        "Microsoft.Net.WebSocketAbstractions": "1.0.0-*"
+        "Microsoft.Net.WebSocketAbstractions": "1.0.0-beta4"
     },
     "compilationOptions": { "allowUnsafe": true },
     "frameworks": {
         "net45": { },
         "dnxcore50": {
             "dependencies": {
-                "System.Collections": "4.0.10-beta-*",
-                "System.Diagnostics.Contracts": "4.0.0-beta-*",
-                "System.Diagnostics.Tools": "4.0.0-beta-*",
-                "System.IO": "4.0.10-beta-*",
-                "System.Linq": "4.0.0-beta-*",
-                "System.Net.Primitives": "4.0.10-beta-*",
-                "System.Resources.ResourceManager": "4.0.0-beta-*",
-                "System.Runtime.Extensions": "4.0.10-beta-*",
-                "System.Security.Cryptography.Hashing.Algorithms": "4.0.0-beta-*",
-                "System.Text.Encoding.Extensions": "4.0.10-beta-*",
-                "System.Threading": "4.0.10-beta-*",
-                "System.Threading.Overlapped": "4.0.0-beta-*",
-                "System.Threading.Tasks": "4.0.10-beta-*",
-                "System.Threading.Timer": "4.0.0-beta-*",
-                "System.Threading.ThreadPool": "4.0.10-beta-*"
+                "System.Collections": "4.0.10-beta-22816",
+                "System.Diagnostics.Contracts": "4.0.0-beta-22816",
+                "System.Diagnostics.Tools": "4.0.0-beta-22816",
+                "System.IO": "4.0.10-beta-22816",
+                "System.Linq": "4.0.0-beta-22816",
+                "System.Net.Primitives": "4.0.10-beta-22816",
+                "System.Resources.ResourceManager": "4.0.0-beta-22816",
+                "System.Runtime.Extensions": "4.0.10-beta-22816",
+                "System.Security.Cryptography.Hashing.Algorithms": "4.0.0-beta-22816",
+                "System.Text.Encoding.Extensions": "4.0.10-beta-22816",
+                "System.Threading": "4.0.10-beta-22816",
+                "System.Threading.Overlapped": "4.0.0-beta-22816",
+                "System.Threading.Tasks": "4.0.10-beta-22816",
+                "System.Threading.Timer": "4.0.0-beta-22816",
+                "System.Threading.ThreadPool": "4.0.10-beta-22816"
             }
         }
     }
