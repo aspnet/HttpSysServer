@@ -406,7 +406,7 @@ namespace Microsoft.AspNet.Server.WebListener
             }))
             {
                 var response = await SendRequestAsync(address);
-                Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(0, response.Headers.WwwAuthenticate.Count);
             }
         }

@@ -69,9 +69,6 @@ namespace Microsoft.AspNet.Server.WebListener
 
         public Task ChallengeAsync(ChallengeContext context)
         {
-            // REVIEW: Is this safe to always just blast on the code even if we aren't accepting?
-            _requestContext.Response.StatusCode = 401;
-
             foreach (var scheme in ListEnabledAuthSchemes())
             {
                 var authScheme = scheme.ToString();
@@ -79,6 +76,7 @@ namespace Microsoft.AspNet.Server.WebListener
                 if (context.AuthenticationScheme == string.Empty ||
                     string.Equals(context.AuthenticationScheme, authScheme, StringComparison.Ordinal))
                 {
+                    _requestContext.Response.StatusCode = 401;
                     _customChallenges |= scheme;
                     context.Accept();
                 }
