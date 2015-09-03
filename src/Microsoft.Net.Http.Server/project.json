@@ -1,25 +1,25 @@
 {
-    "version": "1.0.0-*",
+    "version": "1.0.0-beta7",
     "description": "Implementation of WebListener, a successor to HttpListener. It is used in the WebListener server package.",
     "dependencies": {
-        "Microsoft.Framework.Logging.Abstractions": "1.0.0-*",
-        "Microsoft.Net.WebSockets": "1.0.0-*"
+        "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta7",
+        "Microsoft.Net.WebSockets": "1.0.0-beta7"
     },
     "compilationOptions": {
         "allowUnsafe": true
     },
     "frameworks": {
-        "net451": { },
-        "dnx451": { },
+        "net451": {},
+        "dnx451": {},
         "dnxcore50": {
             "dependencies": {
-                "Microsoft.Win32.Primitives": "4.0.1-beta-*",
-                "System.Diagnostics.Debug": "4.0.11-beta-*",
-                "System.IO.FileSystem": "4.0.1-beta-*",
-                "System.Security.Claims": "4.0.1-beta-*",
-                "System.Security.Cryptography.X509Certificates": "4.0.0-beta-*",
-                "System.Security.Principal.Windows": "4.0.0-beta-*",
-                "System.Threading.Overlapped": "4.0.1-beta-*"
+                "Microsoft.Win32.Primitives": "4.0.1-beta-23225",
+                "System.Diagnostics.Debug": "4.0.11-beta-23225",
+                "System.IO.FileSystem": "4.0.1-beta-23225",
+                "System.Security.Claims": "4.0.1-beta-23225",
+                "System.Security.Cryptography.X509Certificates": "4.0.0-beta-23225",
+                "System.Security.Principal.Windows": "4.0.0-beta-23225",
+                "System.Threading.Overlapped": "4.0.1-beta-23225"
             }
         }
     }
