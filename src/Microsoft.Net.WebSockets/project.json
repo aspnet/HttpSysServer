@@ -1,29 +1,30 @@
 {
-    "version": "1.0.0-*",
+    "version": "1.0.0-beta8",
     "description": "Implementation of WebSocket abstract base class. Used by WebListener.",
-    "dependencies": {
+    "dependencies": {},
+    "compilationOptions": {
+        "allowUnsafe": true
     },
-    "compilationOptions": { "allowUnsafe": true },
     "frameworks": {
-        "net451": { },
-        "dnx451": { },
+        "net451": {},
+        "dnx451": {},
         "dnxcore50": {
             "dependencies": {
-                "System.Collections": "4.0.11-beta-*",
-                "System.Diagnostics.Contracts": "4.0.1-beta-*",
-                "System.Diagnostics.Tools": "4.0.1-beta-*",
-                "System.IO": "4.0.11-beta-*",
-                "System.Linq": "4.0.1-beta-*",
-                "System.Net.Primitives": "4.0.11-beta-*",
-                "System.Net.WebSockets": "4.0.0-beta-*",
-                "System.Resources.ResourceManager": "4.0.1-beta-*",
-                "System.Runtime.Extensions": "4.0.11-beta-*",
-                "System.Security.Cryptography.Algorithms": "4.0.0-beta-*",
-                "System.Text.Encoding.Extensions": "4.0.11-beta-*",
-                "System.Threading": "4.0.11-beta-*",
-                "System.Threading.Tasks": "4.0.11-beta-*",
-                "System.Threading.Timer": "4.0.1-beta-*",
-                "System.Threading.ThreadPool": "4.0.10-beta-*"
+                "System.Collections": "4.0.11-beta-23409",
+                "System.Diagnostics.Contracts": "4.0.1-beta-23409",
+                "System.Diagnostics.Tools": "4.0.1-beta-23409",
+                "System.IO": "4.0.11-beta-23409",
+                "System.Linq": "4.0.1-beta-23409",
+                "System.Net.Primitives": "4.0.11-beta-23409",
+                "System.Net.WebSockets": "4.0.0-beta-23409",
+                "System.Resources.ResourceManager": "4.0.1-beta-23409",
+                "System.Runtime.Extensions": "4.0.11-beta-23409",
+                "System.Security.Cryptography.Algorithms": "4.0.0-beta-23409",
+                "System.Text.Encoding.Extensions": "4.0.11-beta-23409",
+                "System.Threading": "4.0.11-beta-23409",
+                "System.Threading.Tasks": "4.0.11-beta-23409",
+                "System.Threading.Timer": "4.0.1-beta-23409",
+                "System.Threading.ThreadPool": "4.0.10-beta-23409"
             }
         }
     }
