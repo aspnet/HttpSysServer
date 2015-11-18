@@ -1,10 +1,10 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.0-rc1-final",
   "description": "ASP.NET 5 self-host web server.",
   "dependencies": {
-    "Microsoft.AspNet.Hosting": "1.0.0-*",
-    "Microsoft.Net.Http.Headers": "1.0.0-*",
-    "Microsoft.Net.Http.Server": "1.0.0-*"
+    "Microsoft.AspNet.Hosting": "1.0.0-rc1-final",
+    "Microsoft.Net.Http.Headers": "1.0.0-rc1-final",
+    "Microsoft.Net.Http.Server": "1.0.0-rc1-final"
   },
   "compilationOptions": {
     "allowUnsafe": true,
@@ -12,15 +12,15 @@
   },
   "frameworks": {
     "dnx451": {},
-    "net451": { },
+    "net451": {},
     "dnxcore50": {
       "dependencies": {
-        "System.Security.Claims": "4.0.1-beta-*"
+        "System.Security.Claims": "4.0.1-beta-23516"
       }
     },
     "dotnet5.4": {
       "dependencies": {
-        "System.Security.Claims": "4.0.1-beta-*"
+        "System.Security.Claims": "4.0.1-beta-23516"
       }
     }
   }
