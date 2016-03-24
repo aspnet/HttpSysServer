@@ -18,9 +18,7 @@
 using System;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Server.Features;
-using Microsoft.Extensions.ObjectPool;
 using Microsoft.Net.Http.Server;
 
 namespace Microsoft.AspNetCore.Server.WebListener
@@ -34,9 +32,6 @@ namespace Microsoft.AspNetCore.Server.WebListener
         private const int MaxPort = 8000;
         private static int NextPort = BasePort;
         private static object PortLock = new object();
-        private static IHttpContextFactory Factory = new HttpContextFactory(
-            new DefaultObjectPoolProvider(),
-            new HttpContextAccessor());
 
         internal static IServer CreateHttpServer(out string baseAddress, RequestDelegate app)
         {
