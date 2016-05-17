@@ -1,10 +1,10 @@
 {
-  "version": "0.1.0-*",
+  "version": "0.1.0-rc2-final",
   "description": "ASP.NET 5 self-host web server.",
   "dependencies": {
-    "Microsoft.AspNetCore.Hosting": "1.0.0-*",
-    "Microsoft.Net.Http.Headers": "1.0.0-*",
-    "Microsoft.Net.Http.Server": "0.1.0-*"
+    "Microsoft.AspNetCore.Hosting": "1.0.0-rc2-final",
+    "Microsoft.Net.Http.Headers": "1.0.0-rc2-final",
+    "Microsoft.Net.Http.Server": "0.1.0-rc2-final"
   },
   "buildOptions": {
     "allowUnsafe": true,
@@ -19,7 +19,7 @@
     "net451": {},
     "netstandard1.3": {
       "dependencies": {
-        "System.Security.Claims": "4.0.1-*"
+        "System.Security.Claims": "4.0.1-rc2-24027"
       },
       "imports": [
         "portable-net451+win8"
