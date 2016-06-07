@@ -59,7 +59,8 @@ namespace Microsoft.AspNetCore.Server.WebListener
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
 
-            _listener = options.Value?.Listener ?? new Microsoft.Net.Http.Server.WebListener(loggerFactory);
+            _listener = options.Value.Listener;
+            _listener.SetLoggerFactory(loggerFactory);
             _logger = LogHelper.CreateLogger(loggerFactory, typeof(MessagePump));
             Features = new FeatureCollection();
             _serverAddresses = new ServerAddressesFeature();

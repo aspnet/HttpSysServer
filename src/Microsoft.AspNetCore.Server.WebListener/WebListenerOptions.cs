@@ -15,15 +15,12 @@
 // See the Apache 2 License for the specific language governing
 // permissions and limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Server.WebListener
 {
     public class WebListenerOptions
     {
-        public Microsoft.Net.Http.Server.WebListener Listener { get; set; } = new Microsoft.Net.Http.Server.WebListener();
+        public Microsoft.Net.Http.Server.WebListener Listener { get; } = new Microsoft.Net.Http.Server.WebListener();
     }
 }

@@ -86,21 +86,16 @@ namespace Microsoft.Net.Http.Server
         private bool _bufferResponses = true;
 
         public WebListener()
-            : this(null)
-        {
-        }
-
-        public WebListener(ILoggerFactory factory)
         {
             if (!UnsafeNclNativeMethods.HttpApi.Supported)
             {
                 throw new PlatformNotSupportedException();
             }
 
-            _logger = LogHelper.CreateLogger(factory, typeof(WebListener));
-
             Debug.Assert(UnsafeNclNativeMethods.HttpApi.ApiVersion ==
                 UnsafeNclNativeMethods.HttpApi.HTTP_API_VERSION.Version20, "Invalid Http api version");
+
+            SetLoggerFactory(null);
 
             _state = State.Stopped;
             _internalLock = new object();
@@ -202,6 +197,11 @@ namespace Microsoft.Net.Http.Server
                 CheckDisposed();
                 _ignoreWriteExceptions = value;
             }
+        }
+
+        public void SetLoggerFactory(ILoggerFactory loggerFactory)
+        {
+            _logger = LogHelper.CreateLogger(loggerFactory, typeof(WebListener));
         }
 
         /// <summary>

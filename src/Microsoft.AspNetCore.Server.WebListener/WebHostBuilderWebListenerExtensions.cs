@@ -16,14 +16,9 @@
 // permissions and limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Server.WebListener;
-using Microsoft.AspNetCore.Server.WebListener.Internal;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace Microsoft.AspNetCore.Hosting
 {
@@ -41,7 +36,6 @@ namespace Microsoft.AspNetCore.Hosting
         public static IWebHostBuilder UseWebListener(this IWebHostBuilder hostBuilder)
         {
             return hostBuilder.ConfigureServices(services => {
-                services.AddTransient<IConfigureOptions<WebListenerOptions>, WebListenerOptionsSetup>();
                 services.AddSingleton<IServer, MessagePump>();
             });
         }
