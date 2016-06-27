@@ -1,9 +1,9 @@
 {
-  "version": "0.1.0-*",
+  "version": "0.1.0",
   "description": "Implementation of WebListener, a successor to HttpListener. It is used in the WebListener server package.",
   "dependencies": {
-    "Microsoft.Extensions.Logging.Abstractions": "1.0.0-*",
-    "Microsoft.Extensions.Primitives": "1.0.0-*"
+    "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
+    "Microsoft.Extensions.Primitives": "1.0.0"
   },
   "buildOptions": {
     "allowUnsafe": true,
@@ -24,21 +24,21 @@
     },
     "netstandard1.3": {
       "dependencies": {
-        "Microsoft.Win32.Primitives": "4.0.1-*",
-        "System.Diagnostics.Contracts": "4.0.1-*",
-        "System.Diagnostics.Debug": "4.0.11-*",
-        "System.Diagnostics.Tools": "4.0.1-*",
-        "System.IO": "4.1.0-*",
-        "System.IO.FileSystem": "4.0.1-*",
-        "System.Net.Primitives": "4.0.11-*",
-        "System.Runtime.Extensions": "4.1.0-*",
-        "System.Runtime.InteropServices": "4.1.0-*",
-        "System.Security.Claims": "4.0.1-*",
-        "System.Security.Cryptography.X509Certificates": "4.1.0-*",
-        "System.Security.Principal.Windows": "4.0.0-*",
-        "System.Text.Encoding.Extensions": "4.0.11-*",
-        "System.Threading": "4.0.11-*",
-        "System.Threading.Overlapped": "4.0.1-*"
+        "Microsoft.Win32.Primitives": "4.0.1",
+        "System.Diagnostics.Contracts": "4.0.1",
+        "System.Diagnostics.Debug": "4.0.11",
+        "System.Diagnostics.Tools": "4.0.1",
+        "System.IO": "4.1.0",
+        "System.IO.FileSystem": "4.0.1",
+        "System.Net.Primitives": "4.0.11",
+        "System.Runtime.Extensions": "4.1.0",
+        "System.Runtime.InteropServices": "4.1.0",
+        "System.Security.Claims": "4.0.1",
+        "System.Security.Cryptography.X509Certificates": "4.1.0",
+        "System.Security.Principal.Windows": "4.0.0",
+        "System.Text.Encoding.Extensions": "4.0.11",
+        "System.Threading": "4.0.11",
+        "System.Threading.Overlapped": "4.0.1"
       }
     }
   }
