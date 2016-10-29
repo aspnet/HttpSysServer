@@ -85,7 +85,7 @@ namespace Microsoft.AspNetCore.Server.WebListener
             {
                 HttpResponseMessage response = await SendRequestAsync(address);
                 Assert.Equal(901, (int)response.StatusCode);
-                Assert.Equal(string.Empty, response.ReasonPhrase);
+                Assert.Null(response.ReasonPhrase);
                 Assert.Equal(string.Empty, await response.Content.ReadAsStringAsync());
             }
         }
