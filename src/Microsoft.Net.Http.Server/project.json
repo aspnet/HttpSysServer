@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0",
-    "Microsoft.Extensions.Primitives": "1.0.0"
+    "Microsoft.Extensions.Primitives": "1.0.1"
   },
   "buildOptions": {
     "allowUnsafe": true,
@@ -32,7 +32,7 @@
       "dependencies": {
         "Microsoft.Extensions.RuntimeEnvironment.Sources": {
           "type": "build",
-          "version": "1.0.0"
+          "version": "1.0.1"
         },
         "Microsoft.Win32.Primitives": "4.0.1",
         "System.Diagnostics.Contracts": "4.0.1",
