@@ -2,8 +2,8 @@
   "testRunner": "xunit",
   "dependencies": {
     "dotnet-test-xunit": "1.0.0-rc3-000000-01",
-    "Microsoft.Net.Http.Server": "1.0.0",
-    "Microsoft.AspNetCore.Testing": "1.0.0-rtm-21431",
+    "Microsoft.Net.Http.Server": "1.0.1",
+    "Microsoft.AspNetCore.Testing": "1.0.1",
     "xunit": "2.1.0"
   },
   "frameworks": {
