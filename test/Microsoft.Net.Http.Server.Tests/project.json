@@ -2,14 +2,14 @@
   "testRunner": "xunit",
   "dependencies": {
     "dotnet-test-xunit": "2.2.0-*",
-    "Microsoft.Net.Http.Server": "1.1.0-*",
+    "Microsoft.Net.Http.Server": "1.1.0",
     "xunit": "2.2.0-*"
   },
   "frameworks": {
     "netcoreapp1.1": {
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.1.0-*",
+          "version": "1.1.0",
           "type": "platform"
         }
       }
