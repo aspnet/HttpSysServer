@@ -78,7 +78,14 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
                 _urlGroup = new UrlGroup(_serverSession, Logger);
 
-                _requestQueue = new RequestQueue(_urlGroup, Logger);
+                if (Options.AttachToExistingRequestQueue)
+                {
+                    _requestQueue = new RequestQueue(Options.RequestQueueName, Logger);
+                }
+                else
+                {
+                    _requestQueue = new RequestQueue(_urlGroup, Options.RequestQueueName, Logger);
+                }
 
                 _disconnectListener = new DisconnectListener(_requestQueue, Logger);
             }
@@ -146,22 +153,25 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         return;
                     }
 
-                    Options.Authentication.SetUrlGroupSecurity(UrlGroup);
-                    Options.Timeouts.SetUrlGroupTimeouts(UrlGroup);
-                    Options.SetRequestQueueLimit(RequestQueue);
-
-                    _requestQueue.AttachToUrlGroup();
-
-                    // All resources are set up correctly. Now add all prefixes.
-                    try
+                    if (!Options.AttachToExistingRequestQueue)
                     {
-                        Options.UrlPrefixes.RegisterAllPrefixes(UrlGroup);
-                    }
-                    catch (HttpSysException)
-                    {
-                        // If an error occurred while adding prefixes, free all resources allocated by previous steps.
-                        _requestQueue.DetachFromUrlGroup();
-                        throw;
+                        Options.Authentication.SetUrlGroupSecurity(UrlGroup);
+                        Options.Timeouts.SetUrlGroupTimeouts(UrlGroup);
+                        Options.SetRequestQueueLimit(RequestQueue);
+
+                        _requestQueue.AttachToUrlGroup();
+
+                        // All resources are set up correctly. Now add all prefixes.
+                        try
+                        {
+                                Options.UrlPrefixes.RegisterAllPrefixes(UrlGroup);
+                        }
+                        catch (HttpSysException)
+                        {
+                            // If an error occurred while adding prefixes, free all resources allocated by previous steps.
+                            _requestQueue.DetachFromUrlGroup();
+                            throw;
+                        }
                     }
 
                     _state = State.Started;

@@ -32,6 +32,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         /// </summary>
         public bool EnableResponseCaching { get; set; } = true;
 
+        public bool AttachToExistingRequestQueue { get; set; }
+
+        public string RequestQueueName { get; set; } = "SharedTestQueue";
+
         /// <summary>
         /// The url prefixes to register with Http.Sys. These may be modified at any time prior to disposing
         /// the listener.

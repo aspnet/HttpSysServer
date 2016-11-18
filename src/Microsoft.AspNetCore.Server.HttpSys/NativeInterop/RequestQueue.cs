@@ -17,14 +17,42 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private readonly ILogger _logger;
         private bool _disposed;
 
-        internal RequestQueue(UrlGroup urlGroup, ILogger logger)
+        // Open existing queue
+        internal RequestQueue(string queueName, ILogger logger)
+        {
+            _logger = logger;
+
+            HttpRequestQueueV2Handle requestQueueHandle = null;
+            var statusCode = HttpApi.HttpCreateRequestQueue(
+                    HttpApi.Version, queueName, null, 1, out requestQueueHandle);
+
+            if (statusCode != UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS)
+            {
+                throw new HttpSysException((int)statusCode);
+            }
+
+            // Disabling callbacks when IO operation completes synchronously (returns ErrorCodes.ERROR_SUCCESS)
+            if (HttpSysListener.SkipIOCPCallbackOnSuccess &&
+                !UnsafeNclNativeMethods.SetFileCompletionNotificationModes(
+                    requestQueueHandle,
+                    UnsafeNclNativeMethods.FileCompletionNotificationModes.SkipCompletionPortOnSuccess |
+                    UnsafeNclNativeMethods.FileCompletionNotificationModes.SkipSetEventOnHandle))
+            {
+                throw new HttpSysException(Marshal.GetLastWin32Error());
+            }
+
+            Handle = requestQueueHandle;
+            BoundHandle = ThreadPoolBoundHandle.BindHandle(Handle);
+        }
+
+        internal RequestQueue(UrlGroup urlGroup, string queueName, ILogger logger)
         {
             _urlGroup = urlGroup;
             _logger = logger;
 
             HttpRequestQueueV2Handle requestQueueHandle = null;
             var statusCode = HttpApi.HttpCreateRequestQueue(
-                    HttpApi.Version, null, null, 0, out requestQueueHandle);
+                    HttpApi.Version, queueName, null, 0, out requestQueueHandle);
 
             if (statusCode != UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS)
             {
@@ -51,6 +79,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         internal unsafe void AttachToUrlGroup()
         {
             CheckDisposed();
+
+            if (_urlGroup == null)
+            {
+                return;
+            }
+
             // Set the association between request queue and url group. After this, requests for registered urls will 
             // get delivered to this request queue.
 
@@ -67,6 +101,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         internal unsafe void DetachFromUrlGroup()
         {
             CheckDisposed();
+
+            if (_urlGroup == null)
+            {
+                return;
+            }
+
             // Break the association between request queue and url group. After this, requests for registered urls 
             // will get 503s.
             // Note that this method may be called multiple times (Stop() and then Abort()). This
