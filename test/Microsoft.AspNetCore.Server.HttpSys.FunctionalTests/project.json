@@ -21,7 +21,7 @@
         "System.Net.WebSockets.Client": "4.4.0-*"
       }
     },
-    "net451": {
+    "net46": {
       "frameworkAssemblies": {
         "System.DirectoryServices": "",
         "System.Net.Http": "",
