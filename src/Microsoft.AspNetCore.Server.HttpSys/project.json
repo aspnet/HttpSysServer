@@ -27,7 +27,6 @@
     "xmlDoc": true
   },
   "frameworks": {
-    "net451": {},
     "netstandard1.3": {
       "dependencies": {
         "Microsoft.Extensions.RuntimeEnvironment.Sources": {

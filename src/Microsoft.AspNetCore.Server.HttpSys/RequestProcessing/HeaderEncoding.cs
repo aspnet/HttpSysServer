@@ -14,7 +14,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         internal static unsafe string GetString(sbyte* pBytes, int byteCount)
         {
-            // net451: return new string(pBytes, 0, byteCount, Encoding);
+            // net46: return new string(pBytes, 0, byteCount, Encoding);
 
             var charCount = Encoding.GetCharCount((byte*)pBytes, byteCount);
             var chars = new char[charCount];
