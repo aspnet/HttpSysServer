@@ -29,6 +29,7 @@ namespace Microsoft.AspNetCore.Server.WebListener
         private bool _stopping;
         private int _outstandingRequests;
         private ManualResetEvent _shutdownSignal;
+        private TimeSpan _shutdownTimeout;
 
         private readonly ServerAddressesFeature _serverAddresses;
 
@@ -54,6 +55,7 @@ namespace Microsoft.AspNetCore.Server.WebListener
             _maxAccepts = optionsInstance.MaxAccepts;
             EnableResponseCaching = optionsInstance.EnableResponseCaching;
             _shutdownSignal = new ManualResetEvent(false);
+            _shutdownTimeout = TimeSpan.FromSeconds(5);
         }
 
         internal Microsoft.Net.Http.Server.WebListener Listener
@@ -222,7 +224,15 @@ namespace Microsoft.AspNetCore.Server.WebListener
             if (_outstandingRequests > 0)
             {
                 LogHelper.LogInfo(_logger, "Stopping, waiting for " + _outstandingRequests + " request(s) to drain.");
-                _shutdownSignal.WaitOne();
+                var drained = _shutdownSignal.WaitOne(_shutdownTimeout);
+                if (drained)
+                {
+                    LogHelper.LogInfo(_logger, "All requests drained successfully.");
+                }
+                else
+                {
+                    LogHelper.LogInfo(_logger, "Timed out, terminating " + _outstandingRequests + " request(s).");
+                }
             }
             // All requests are finished
             _listener.Dispose();
