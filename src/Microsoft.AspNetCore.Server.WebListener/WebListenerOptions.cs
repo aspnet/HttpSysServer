@@ -26,5 +26,11 @@ namespace Microsoft.AspNetCore.Server.WebListener
         /// either a Shared-Max-Age or Max-Age value, or an Expires header.
         /// </summary>
         public bool EnableResponseCaching { get; set; } = true;
+
+        /// <summary>
+        /// The amount of time to wait for active requests to drain while the server is shutting down.
+        /// New requests will receive a 503 response in this time period. The default is 5 seconds.
+        /// </summary>
+        public TimeSpan ShutdownTimeout { get; set; } = TimeSpan.FromSeconds(5);
     }
 }
