@@ -2,10 +2,17 @@
   "profiles": {
     "SelfHostServer": {
       "commandName": "Project",
+      "commandLineArgs": "-ap \"queuename\" -v \"v4.0\" -l \"webengine4.dll\" -a \\\\.\\pipe\\iisipm853a4108-f312-4cda-b9be-9267f950c97b -h \"C:\\inetpub\\temp\\apppools\\DefaultAppPool\\DefaultAppPool.config\" -w \"\" -m 0 -t 20 -ta 0",
       "launchBrowser": true,
       "launchUrl": "http://localhost:8080/",
       "environmentVariables": {
         "ASPNETCORE_URLS": "http://localhost:8080/",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "web": {
+      "commandName": "web",
+      "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
