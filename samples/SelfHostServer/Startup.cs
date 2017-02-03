@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -31,6 +33,17 @@ namespace SelfHostServer
 
         public static void Main(string[] args)
         {
+            /*
+            var host0 = new WebHostBuilder()
+                .UseStartup<Startup>()
+                .UseHttpSys(options =>
+                {
+                    options.AttachToExistingRequestQueue = false;
+                    options.RequestQueueName = "queuename";
+                })
+                .Build();
+            host0.Start();
+            */
             var host = new WebHostBuilder()
                 .ConfigureLogging(factory => factory.AddConsole())
                 .UseStartup<Startup>()
@@ -39,6 +52,8 @@ namespace SelfHostServer
                     options.UrlPrefixes.Add("http://localhost:5000");
                     options.Authentication.Schemes = AuthenticationSchemes.None;
                     options.Authentication.AllowAnonymous = true;
+                    options.AttachToExistingRequestQueue = false;
+                    options.RequestQueueName = "queuename";
                 })
                 .Build();
 
