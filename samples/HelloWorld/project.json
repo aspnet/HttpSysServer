@@ -3,7 +3,7 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Microsoft.Net.Http.Server": "1.0.1"
+    "Microsoft.Net.Http.Server": "1.0.2"
   },
   "commands": {
     "sample": "HelloWorld"

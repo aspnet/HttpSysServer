@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "ASP.NET Core HTTP server for Windows.",
   "packOptions": {
     "tags": [
@@ -10,7 +10,7 @@
   "dependencies": {
     "Microsoft.AspNetCore.Hosting": "1.0.1",
     "Microsoft.Net.Http.Headers": "1.0.1",
-    "Microsoft.Net.Http.Server": "1.0.1"
+    "Microsoft.Net.Http.Server": "1.0.2"
   },
   "buildOptions": {
     "allowUnsafe": true,
