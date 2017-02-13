@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "Microsoft.AspNetCore.Server.WebListener": "1.0.2",
-    "Microsoft.Extensions.Logging.Console": "1.0.1"
+    "Microsoft.Extensions.Logging.Console": "1.0.2"
   },
   "buildOptions": {
     "emitEntryPoint": true
@@ -14,7 +14,7 @@
     "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.0.3",
+          "version": "1.0.4",
           "type": "platform"
         }
       }
