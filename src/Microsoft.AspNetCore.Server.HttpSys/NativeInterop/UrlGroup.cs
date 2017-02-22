@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         internal ulong Id { get; private set; }
 
         internal void SetProperty(HttpApi.HTTP_SERVER_PROPERTY property, IntPtr info, uint infosize, bool throwOnError = true)
-        {            
+        {
             Debug.Assert(info != IntPtr.Zero, "SetUrlGroupProperty called with invalid pointer");
             CheckDisposed();
 
@@ -70,7 +70,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 }
             }
         }
-        
+
         internal bool UnregisterPrefix(string uriPrefix)
         {
             LogHelper.LogInfo(_logger, "Stop listening on prefix: " + uriPrefix);

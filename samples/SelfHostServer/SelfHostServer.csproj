@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Server.HttpSys\Microsoft.AspNetCore.Server.HttpSys.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="1.2.0-*" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.2.0-*" />
   </ItemGroup>
 </Project>

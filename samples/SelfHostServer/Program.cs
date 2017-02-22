@@ -10,29 +10,8 @@ using Microsoft.Extensions.Logging;
 
 namespace SelfHostServer
 {
-    public class Startup
+    public class Program
     {
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // Server options can be configured here instead of in Main.
-            services.Configure<HttpSysOptions>(options =>
-            {
-                options.Authentication.Schemes = AuthenticationSchemes.None;
-                options.Authentication.AllowAnonymous = true;
-            });
-        }
-
-        public void Configure(IApplicationBuilder app, ILoggerFactory loggerfactory)
-        {
-            loggerfactory.AddConsole(LogLevel.Debug);
-
-            app.Run(async context =>
-            {
-                context.Response.ContentType = "text/plain";
-                await context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now);
-            });
-        }
-
         public static void Main(string[] args)
         {
             var config = new ConfigurationBuilder().AddCommandLine(options =>
@@ -52,27 +31,45 @@ namespace SelfHostServer
                     { "-ta", "talent" },
                 };
             }).Build();
-            /*
-            var host0 = new WebHostBuilder()
-                .UseStartup<Startup>()
+
+            Console.Write("create and (l)isten, (c)reate only, or (a)ttach to existing and listen? ");
+            var key = Console.ReadKey();
+            Console.WriteLine();
+
+            var host = new WebHostBuilder()
                 .UseHttpSys(options =>
                 {
-                    options.AttachToExistingRequestQueue = false;
+                    options.AttachToExistingRequestQueue = key.KeyChar == 'a';
+                    options.MaxAccepts = key.KeyChar == 'c' ? 0 : 5;
                     options.RequestQueueName = config["queuename"];
                 })
-                .Build();
-            host0.Start();
-            */
-            var host = new WebHostBuilder()
-                .UseStartup<Startup>()
-                .UseHttpSys(options =>
+                .ConfigureLogging(loggerFactory =>
                 {
-                    options.AttachToExistingRequestQueue = true;
-                    options.RequestQueueName = config["queuename"];
+                    loggerFactory.AddConsole(LogLevel.Debug);
+                })
+                .Configure(app =>
+                {
+                    app.Run(async context =>
+                    {
+                        context.Response.ContentType = "text/plain";
+                        await context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now + (key.KeyChar == 'a' ? " attached": " created"));
+                        // await context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now);
+                    });
                 })
                 .Build();
 
             host.Run();
+        }
+
+        // Options can also be configured in Startup:
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Server options can be configured here instead of in Main.
+            services.Configure<HttpSysOptions>(options =>
+            {
+                options.Authentication.Schemes = AuthenticationSchemes.None;
+                options.Authentication.AllowAnonymous = true;
+            });
         }
     }
 }
