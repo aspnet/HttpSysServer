@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,8 @@ namespace SelfHostServer
 {
     public class Program
     {
+        private static readonly byte[] _helloWorldPayload = Encoding.UTF8.GetBytes("Hello, World!");
+
         public static void Main(string[] args)
         {
             var config = new ConfigurationBuilder().AddCommandLine(options =>
@@ -31,29 +34,31 @@ namespace SelfHostServer
                     { "-ta", "talent" },
                 };
             }).Build();
-
+            /*
             Console.Write("create and (l)isten, (c)reate only, or (a)ttach to existing and listen? ");
             var key = Console.ReadKey();
             Console.WriteLine();
-
+            */
             var host = new WebHostBuilder()
                 .UseHttpSys(options =>
                 {
-                    options.AttachToExistingRequestQueue = key.KeyChar == 'a';
-                    options.MaxAccepts = key.KeyChar == 'c' ? 0 : 5;
+                    options.AttachToExistingRequestQueue = true; // key.KeyChar == 'a';
+                    // options.MaxAccepts = key.KeyChar == 'c' ? 0 : 5;
                     options.RequestQueueName = config["queuename"];
                 })
                 .ConfigureLogging(loggerFactory =>
                 {
-                    loggerFactory.AddConsole(LogLevel.Debug);
+                    // loggerFactory.AddConsole(LogLevel.Debug);
                 })
                 .Configure(app =>
                 {
-                    app.Run(async context =>
+                    app.Run(context =>
                     {
+                        context.Response.StatusCode = 200;
                         context.Response.ContentType = "text/plain";
-                        await context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now + (key.KeyChar == 'a' ? " attached": " created"));
-                        // await context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now);
+                        context.Response.ContentLength = _helloWorldPayload.Length;
+                        return context.Response.Body.WriteAsync(_helloWorldPayload, 0, _helloWorldPayload.Length);
+                        // return context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now + (key.KeyChar == 'a' ? " attached": " created"));
                     });
                 })
                 .Build();
