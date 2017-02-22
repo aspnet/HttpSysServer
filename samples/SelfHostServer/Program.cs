@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Server.HttpSys;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -12,6 +9,8 @@ namespace SelfHostServer
 {
     public class Program
     {
+        private static readonly byte[] _helloWorldPayload = Encoding.UTF8.GetBytes("Hello, World!");
+
         public static void Main(string[] args)
         {
             Console.Write("create and (l)isten, (c)reate only, or (a)ttach to existing and listen? ");
@@ -31,27 +30,18 @@ namespace SelfHostServer
                 })
                 .Configure(app =>
                 {
-                    app.Run(async context =>
+                    app.Run(context =>
                     {
+                        context.Response.StatusCode = 200;
                         context.Response.ContentType = "text/plain";
-                        await context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now + (key.KeyChar == 'a' ? " attached": " created"));
-                        // await context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now);
+                        context.Response.ContentLength = _helloWorldPayload.Length;
+                        return context.Response.Body.WriteAsync(_helloWorldPayload, 0, _helloWorldPayload.Length);
+                        // return context.Response.WriteAsync("Hello world from " + context.Request.Host + " at " + DateTime.Now + (key.KeyChar == 'a' ? " attached": " created"));
                     });
                 })
                 .Build();
 
             host.Run();
-        }
-
-        // Options can also be configured in Startup:
-        public void ConfigureServices(IServiceCollection services)
-        {
-            // Server options can be configured here instead of in Main.
-            services.Configure<HttpSysOptions>(options =>
-            {
-                options.Authentication.Schemes = AuthenticationSchemes.None;
-                options.Authentication.AllowAnonymous = true;
-            });
         }
     }
 }
