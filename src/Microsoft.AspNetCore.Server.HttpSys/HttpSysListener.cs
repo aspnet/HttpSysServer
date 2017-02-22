@@ -18,7 +18,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
     {
         // Win8# 559317 fixed a bug in Http.sys's HttpReceiveClientCertificate method.
         // Without this fix IOCP callbacks were not being called although ERROR_IO_PENDING was
-        // returned from HttpReceiveClientCertificate when using the 
+        // returned from HttpReceiveClientCertificate when using the
         // FileCompletionNotificationModes.SkipCompletionPortOnSuccess flag.
         // This bug was only hit when the buffer passed into HttpReceiveClientCertificate
         // (1500 bytes initially) is too small for the certificate.
@@ -26,8 +26,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         // flag is only used on Win8 and later.
         internal static readonly bool SkipIOCPCallbackOnSuccess = ComNetOS.IsWin8orLater;
 
-        // Mitigate potential DOS attacks by limiting the number of unknown headers we accept.  Numerous header names 
-        // with hash collisions will cause the server to consume excess CPU.  1000 headers limits CPU time to under 
+        // Mitigate potential DOS attacks by limiting the number of unknown headers we accept.  Numerous header names
+        // with hash collisions will cause the server to consume excess CPU.  1000 headers limits CPU time to under
         // 0.5 seconds per request.  Respond with a 400 Bad Request.
         private const int UnknownHeaderLimit = 1000;
 
@@ -75,17 +75,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             try
             {
                 _serverSession = new ServerSession();
-
                 _urlGroup = new UrlGroup(_serverSession, Logger);
-
-                if (Options.AttachToExistingRequestQueue)
-                {
-                    _requestQueue = new RequestQueue(Options.RequestQueueName, Logger);
-                }
-                else
-                {
-                    _requestQueue = new RequestQueue(_urlGroup, Options.RequestQueueName, Logger);
-                }
+                _requestQueue = new RequestQueue(_urlGroup, Options.RequestQueueName, Options.AttachToExistingRequestQueue, Logger);
 
                 _disconnectListener = new DisconnectListener(_requestQueue, Logger);
             }
@@ -199,7 +190,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         return;
                     }
 
-                    Options.UrlPrefixes.UnregisterAllPrefixes();
+                    if (!Options.AttachToExistingRequestQueue)
+                    {
+                        Options.UrlPrefixes.UnregisterAllPrefixes();
+                    }
 
                     _state = State.Stopped;
 

@@ -24,6 +24,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         internal static class ErrorCodes
         {
             internal const uint ERROR_SUCCESS = 0;
+            internal const uint ERROR_FILE_NOT_FOUND = 2;
             internal const uint ERROR_HANDLE_EOF = 38;
             internal const uint ERROR_NOT_SUPPORTED = 50;
             internal const uint ERROR_INVALID_PARAMETER = 87;
@@ -142,7 +143,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         // DACL related stuff
 
         [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instantiated natively")]
-        [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable", 
+        [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable",
             Justification = "Does not own the resource.")]
         [StructLayout(LayoutKind.Sequential)]
         internal class SECURITY_ATTRIBUTES

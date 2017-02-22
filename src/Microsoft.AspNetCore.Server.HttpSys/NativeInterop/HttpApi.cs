@@ -65,7 +65,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         [DllImport(HTTPAPI, ExactSpelling = true, CallingConvention = CallingConvention.StdCall, CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern unsafe uint HttpCreateRequestQueue(HTTPAPI_VERSION version, string pName,
-            UnsafeNclNativeMethods.SECURITY_ATTRIBUTES pSecurityAttributes, uint flags, out HttpRequestQueueV2Handle pReqQueueHandle);
+            UnsafeNclNativeMethods.SECURITY_ATTRIBUTES pSecurityAttributes, HTTP_CREATE_REQUEST_QUEUE_FLAG flags, out HttpRequestQueueV2Handle pReqQueueHandle);
 
         [DllImport(HTTPAPI, ExactSpelling = true, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         internal static extern unsafe uint HttpCloseRequestQueue(IntPtr pReqQueueHandle);
@@ -75,6 +75,16 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             Invalid,
             Version10,
             Version20,
+        }
+
+        [Flags]
+        internal enum HTTP_CREATE_REQUEST_QUEUE_FLAG : uint
+        {
+            None = 0,
+            // The HTTP_CREATE_REQUEST_QUEUE_FLAG_OPEN_EXISTING flag allows applications to open an existing request queue by name and retrieve the request queue handle. The pName parameter must contain a valid request queue name; it cannot be NULL.
+            OpenExisting = 1,
+            // The handle to the request queue created using this flag cannot be used to perform I/O operations. This flag can be set only when the request queue handle is created.
+            Controller = 2,
         }
 
         // see http.w for definitions
@@ -735,7 +745,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static HTTPAPI_VERSION version;
 
         // This property is used by HttpListener to pass the version structure to the native layer in API
-        // calls. 
+        // calls.
 
         internal static HTTPAPI_VERSION Version
         {
@@ -745,7 +755,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        // This property is used by HttpListener to get the Api version in use so that it uses appropriate 
+        // This property is used by HttpListener to get the Api version in use so that it uses appropriate
         // Http APIs.
 
         internal static HTTP_API_VERSION ApiVersion
