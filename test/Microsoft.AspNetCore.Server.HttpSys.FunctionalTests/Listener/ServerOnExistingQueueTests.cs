@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -14,13 +15,14 @@ using Xunit;
 
 namespace Microsoft.AspNetCore.Server.HttpSys.Listener
 {
-    public class ServerTests
+    public class ServerOnExistingQueueTests
     {
         [ConditionalFact]
         public async Task Server_200OK_Success()
         {
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 var responseTask = SendRequestAsync(address);
 
@@ -36,7 +38,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         public async Task Server_SendHelloWorld_Success()
         {
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 Task<string> responseTask = SendRequestAsync(address);
 
@@ -56,7 +59,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         public async Task Server_EchoHelloWorld_Success()
         {
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 var responseTask = SendRequestAsync(address, "Hello World");
 
@@ -81,7 +85,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
             var canceled = new ManualResetEvent(false);
 
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 using (var client = new HttpClient())
                 {
@@ -112,7 +117,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
             var canceled = new ManualResetEvent(false);
 
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 using (var client = new HttpClient())
                 {
@@ -143,7 +149,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
             var canceled = new ManualResetEvent(false);
 
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 using (var client = new HttpClient())
                 {
@@ -174,7 +181,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
             var canceled = new ManualResetEvent(false);
 
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 var responseTask = SendRequestAsync(address);
 
@@ -186,13 +194,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
                 context.Abort();
                 Assert.True(canceled.WaitOne(interval), "Aborted");
                 Assert.True(ct.IsCancellationRequested, "IsCancellationRequested");
-#if NET461
+#if !NETCOREAPP1_1
                 // HttpClient re-tries the request because it doesn't know if the request was received.
                 context = await server.AcceptAsync(Utilities.DefaultTimeout);
                 context.Abort();
-#elif NETCOREAPP2_0
-#else
-#error Target framework needs to be updated
 #endif
                 await Assert.ThrowsAsync<HttpRequestException>(() => responseTask);
             }
@@ -205,7 +210,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
             var canceled = new ManualResetEvent(false);
 
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 var responseTask = SendRequestAsync(address);
 
@@ -235,7 +241,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         public async Task Server_SetQueueLimit_Success()
         {
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 server.Options.RequestQueueLimit = 1001;
                 var responseTask = SendRequestAsync(address);
@@ -252,7 +259,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         public async Task Server_HotAddPrefix_Success()
         {
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 var responseTask = SendRequestAsync(address);
 
@@ -283,7 +291,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         public async Task Server_HotRemovePrefix_Success()
         {
             string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var baseServer = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateServerOnExistingQueue(baseServer.Options.RequestQueueName))
             {
                 address += "pathbase/";
                 server.Options.UrlPrefixes.Add(address);

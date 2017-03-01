@@ -61,6 +61,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 PathBase = string.Empty;
                 Path = string.Empty;
             }
+            // TODO: How to make base paths work when the prefix is defined elsewhere? Loop and test?
+            else if (RequestContext.Server.Options.AttachToExistingRequestQueue || prefix == null)
+            {
+                PathBase = string.Empty;
+                Path = originalPath;
+            }
             // These paths are both unescaped already.
             else if (originalPath.Length == prefix.Path.Length - 1)
             {

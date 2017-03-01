@@ -155,7 +155,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         // All resources are set up correctly. Now add all prefixes.
                         try
                         {
-                                Options.UrlPrefixes.RegisterAllPrefixes(UrlGroup);
+                            Options.UrlPrefixes.RegisterAllPrefixes(UrlGroup);
                         }
                         catch (HttpSysException)
                         {

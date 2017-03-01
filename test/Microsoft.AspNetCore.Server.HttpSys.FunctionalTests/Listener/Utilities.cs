@@ -57,8 +57,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
                     var prefix = UrlPrefix.Create("http", "localhost", port, basePath);
                     root = prefix.Scheme + "://" + prefix.Host + ":" + prefix.Port;
                     baseAddress = prefix.ToString();
-                    var listener = new HttpSysListener(new HttpSysOptions(), new LoggerFactory());
-                    listener.Options.UrlPrefixes.Add(prefix);
+                    var options = new HttpSysOptions();
+                    options.UrlPrefixes.Add(prefix);
+                    options.RequestQueueName = prefix.Port; // Convention for use with CreateServerOnExistingQueue
+                    var listener = new HttpSysListener(options, new LoggerFactory());
                     try
                     {
                         listener.Start();
@@ -72,6 +74,22 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
                 NextPort = BasePort;
             }
             throw new Exception("Failed to locate a free port.");
+        }
+        internal static HttpSysListener CreateServerOnExistingQueue(string requestQueueName)
+        {
+            return CreateServerOnExistingQueue(AuthenticationSchemes.None, true, requestQueueName);
+        }
+
+        internal static HttpSysListener CreateServerOnExistingQueue(AuthenticationSchemes authScheme, bool allowAnonymos, string requestQueueName)
+        {
+            var options = new HttpSysOptions();
+            options.AttachToExistingRequestQueue = true;
+            options.RequestQueueName = requestQueueName;
+            options.Authentication.Schemes = authScheme;
+            options.Authentication.AllowAnonymous = allowAnonymos;
+            var listener = new HttpSysListener(options, new LoggerFactory());
+            listener.Start();
+            return listener;
         }
 
         internal static HttpSysListener CreateHttpsServer()

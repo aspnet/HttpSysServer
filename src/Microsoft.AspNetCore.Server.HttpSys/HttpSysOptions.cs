@@ -32,7 +32,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         public bool AttachToExistingRequestQueue { get; set; }
 
-        public string RequestQueueName { get; set; } = "SharedTestQueue";
+        public string RequestQueueName { get; set; }
 
         /// <summary>
         /// The url prefixes to register with Http.Sys. These may be modified at any time prior to disposing

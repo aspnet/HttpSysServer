@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             lock (_prefixes)
             {
-                return _prefixes[id];
+                return _prefixes.TryGetValue(id, out var prefix) ? prefix : null;
             }
         }
 

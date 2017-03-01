@@ -35,6 +35,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             {
                 throw new HttpSysException((int)statusCode, $"Failed to attach to the given request queue '{queueName}', the queue could not be found.");
             }
+            else if (statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_INVALID_NAME)
+            {
+                throw new HttpSysException((int)statusCode, $"The given request queue name '{queueName}' is invalid.");
+            }
             else if (statusCode != UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS)
             {
                 throw new HttpSysException((int)statusCode);
