@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Features.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Internal;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
@@ -17,14 +18,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private AuthenticationSchemes _authSchemes;
         private AuthenticationSchemes _customChallenges;
 
-        internal AuthenticationHandler(RequestContext requestContext)
-        {
-            _requestContext = requestContext;
-            _authSchemes = requestContext.Response.AuthenticationChallenges;
-            _customChallenges = AuthenticationSchemes.None;
-        }
-
-        public Task AuthenticateAsync(AuthenticateContext context)
+        public Task<AuthenticateResult> AuthenticateAsync(AuthenticateContext context)
         {
             var identity = _requestContext.User?.Identity;
 
@@ -36,50 +30,42 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     if (identity != null && identity.IsAuthenticated
                         && string.Equals(authScheme, identity.AuthenticationType, StringComparison.Ordinal))
                     {
-                        context.Authenticated(_requestContext.User, properties: null, description: null);
-                    }
-                    else
-                    {
-                        context.NotAuthenticated();
+                        return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), properties: null, authenticationScheme: context.AuthenticationScheme)));
                     }
                 }
             }
-            return TaskCache.CompletedTask;
+            return Task.FromResult(AuthenticateResult.None());
         }
 
         public Task ChallengeAsync(ChallengeContext context)
         {
-            var automaticChallenge = string.Equals("Automatic", context.AuthenticationScheme, StringComparison.Ordinal);
+            //var automaticChallenge = string.Equals("Automatic", context.AuthenticationScheme, StringComparison.Ordinal);
             foreach (var scheme in ListEnabledAuthSchemes())
             {
                 var authScheme = scheme.ToString();
                 // Not including any auth types means it's a blanket challenge for any auth type.
-                if (automaticChallenge || string.Equals(context.AuthenticationScheme, authScheme, StringComparison.Ordinal))
+                if (string.Equals(context.AuthenticationScheme, authScheme, StringComparison.Ordinal))
                 {
                     switch (context.Behavior)
                     {
                         case ChallengeBehavior.Forbidden:
                             _requestContext.Response.StatusCode = 403;
-                            context.Accept();
                             break;
                         case ChallengeBehavior.Unauthorized:
                             _requestContext.Response.StatusCode = 401;
                             _customChallenges |= scheme;
-                            context.Accept();
                             break;
                         case ChallengeBehavior.Automatic:
                             var identity = (ClaimsIdentity)_requestContext.User?.Identity;
                             if (identity != null && identity.IsAuthenticated
-                                && (automaticChallenge || string.Equals(identity.AuthenticationType, context.AuthenticationScheme, StringComparison.Ordinal)))
+                                && (string.Equals(identity.AuthenticationType, context.AuthenticationScheme, StringComparison.Ordinal)))
                             {
                                 _requestContext.Response.StatusCode = 403;
-                                context.Accept();
                             }
                             else
                             {
                                 _requestContext.Response.StatusCode = 401;
                                 _customChallenges |= scheme;
-                                context.Accept();
                             }
                             break;
                         default:
@@ -92,13 +78,23 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             return TaskCache.CompletedTask;
         }
 
-        public void GetDescriptions(DescribeSchemesContext context)
+        public Task<bool> HandleRequestAsync()
         {
-            // TODO: Caching, this data doesn't change per request.
-            foreach (var scheme in ListEnabledAuthSchemes())
+            throw new NotImplementedException();
+        }
+
+        public Task InitializeAsync(AuthenticationScheme scheme, HttpContext context)
+        {
+            _requestContext = context.Features.Get<RequestContext>();
+
+            if (_requestContext == null)
             {
-                context.Accept(GetDescription(scheme.ToString()));
+                throw new InvalidOperationException("No RequestContext found.");
             }
+
+            _authSchemes = _requestContext.Response.AuthenticationChallenges;
+            _customChallenges = AuthenticationSchemes.None;
+            return TaskCache.CompletedTask;
         }
 
         public Task SignInAsync(SignInContext context)
@@ -113,6 +109,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             return TaskCache.CompletedTask;
         }
 
+<<<<<<< HEAD
         private IDictionary<string, object> GetDescription(string authenticationScheme)
         {
             return new Dictionary<string, object>()
@@ -120,6 +117,16 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 { "AuthenticationScheme", authenticationScheme },
             };
         }
+=======
+        //private IDictionary<string, object> GetDescription(string authenticationScheme)
+        //{
+        //    return new Dictionary<string, object>()
+        //    {
+        //        { "AuthenticationScheme", authenticationScheme },
+        //        { "DisplayName", "Windows:" + authenticationScheme },
+        //    };
+        //}
+>>>>>>> Prototype Auth 2.0 changes
 
         private IEnumerable<AuthenticationSchemes> ListEnabledAuthSchemes()
         {

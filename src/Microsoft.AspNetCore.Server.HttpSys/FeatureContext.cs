@@ -68,7 +68,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             _requestContext = requestContext;
             _features = new FeatureCollection(new StandardFeatureCollection(this));
-            _authHandler = new AuthenticationHandler(requestContext);
+            //_authHandler = new AuthenticationHandler(requestContext);
             _enableResponseCaching = enableResponseCaching;
 
             // Pre-initialize any fields that are not lazy at the lower level.
