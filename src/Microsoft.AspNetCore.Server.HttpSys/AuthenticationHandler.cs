@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -84,55 +83,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public Task SignOutAsync(SignOutContext context)
         {
             return TaskCache.CompletedTask;
-        }
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-        private IDictionary<string, object> GetDescription(string authenticationScheme)
-        {
-            return new Dictionary<string, object>()
-            {
-                { "AuthenticationScheme", authenticationScheme },
-            };
-        }
-=======
-        //private IDictionary<string, object> GetDescription(string authenticationScheme)
-        //{
-        //    return new Dictionary<string, object>()
-        //    {
-        //        { "AuthenticationScheme", authenticationScheme },
-        //        { "DisplayName", "Windows:" + authenticationScheme },
-        //    };
-        //}
->>>>>>> Prototype Auth 2.0 changes
-
-=======
->>>>>>> PR fixes
-        private IEnumerable<AuthenticationSchemes> ListEnabledAuthSchemes()
-        {
-            // Order by strength.
-            if ((_authSchemes & AuthenticationSchemes.Kerberos) == AuthenticationSchemes.Kerberos)
-            {
-                yield return AuthenticationSchemes.Kerberos;
-            }
-            if ((_authSchemes & AuthenticationSchemes.Negotiate) == AuthenticationSchemes.Negotiate)
-            {
-                yield return AuthenticationSchemes.Negotiate;
-            }
-            if ((_authSchemes & AuthenticationSchemes.NTLM) == AuthenticationSchemes.NTLM)
-            {
-                yield return AuthenticationSchemes.NTLM;
-            }
-            /*if ((_authSchemes & AuthenticationSchemes.Digest) == AuthenticationSchemes.Digest)
-            {
-                // TODO:
-                throw new NotImplementedException("Digest challenge generation has not been implemented.");
-                yield return AuthenticationSchemes.Digest;
-            }*/
-            if ((_authSchemes & AuthenticationSchemes.Basic) == AuthenticationSchemes.Basic)
-            {
-                yield return AuthenticationSchemes.Basic;
-            }
         }
     }
 }
