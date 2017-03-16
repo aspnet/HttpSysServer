@@ -5,6 +5,8 @@ using System;
 using System.Diagnostics.Contracts;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Features;
@@ -30,7 +32,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private readonly ServerAddressesFeature _serverAddresses;
 
-        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory)
+        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory, IAuthenticationSchemeProvider authentication)
         {
             if (options == null)
             {
@@ -40,10 +42,17 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
+            if (authentication == null)
+            {
+                throw new ArgumentNullException(nameof(authentication));
+            }
 
             _options = options.Value;
             Listener = new HttpSysListener(_options, loggerFactory);
             _logger = LogHelper.CreateLogger(loggerFactory, typeof(MessagePump));
+
+            AddSchemes(authentication, _options.Authentication.Schemes);
+
             Features = new FeatureCollection();
             _serverAddresses = new ServerAddressesFeature();
             Features.Set<IServerAddressesFeature>(_serverAddresses);
@@ -60,7 +69,33 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         public IFeatureCollection Features { get; }
 
+        private void AddScheme(IAuthenticationSchemeProvider authentication, string scheme)
+        {
+            authentication.AddScheme(new AuthenticationScheme(scheme, typeof(AuthenticationHandler), new Dictionary<string, object>()));
+        }
+
+        private void AddSchemes(IAuthenticationSchemeProvider authentication, AuthenticationSchemes schemes)
+        {
+            if ((schemes & AuthenticationSchemes.Kerberos) == AuthenticationSchemes.Kerberos)
+            {
+                AddScheme(authentication, "Kerberos");
+            }
+            if ((schemes & AuthenticationSchemes.Negotiate) == AuthenticationSchemes.Negotiate)
+            {
+                AddScheme(authentication, "Negotiate");
+            }
+            if ((schemes & AuthenticationSchemes.NTLM) == AuthenticationSchemes.NTLM)
+            {
+                AddScheme(authentication, "NTLM");
+            }
+            if ((schemes & AuthenticationSchemes.Basic) == AuthenticationSchemes.Basic)
+            {
+                AddScheme(authentication, "Basic");
+            }
+        }
+
         public Task StartAsync<TContext>(IHttpApplication<TContext> application, CancellationToken cancellationToken)
+
         {
             if (application == null)
             {

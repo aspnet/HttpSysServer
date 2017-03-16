@@ -24,18 +24,7 @@ namespace Microsoft.AspNetCore.Hosting
         {
             return hostBuilder.ConfigureServices(services => {
                 services.AddSingleton<IServer, MessagePump>();
-                services.AddAuthentication(o => RegisterAuthenticationSchemes(services, o));
             });
-        }
-
-        private static void RegisterAuthenticationSchemes(IServiceCollection services, AuthenticationOptions options)
-        {
-            // TODO: don't know which schemes are configured yet, so have to listen to all
-            options.AddScheme("Kerberos", builder => builder.HandlerType = typeof(AuthenticationHandler));
-            options.AddScheme("Negotiate", builder => builder.HandlerType = typeof(AuthenticationHandler));
-            options.AddScheme("NTLM", builder => builder.HandlerType = typeof(AuthenticationHandler));
-            options.AddScheme("Basic", builder => builder.HandlerType = typeof(AuthenticationHandler));
-            options.AddScheme("None", builder => builder.HandlerType = typeof(AuthenticationHandler));
         }
 
         /// <summary>

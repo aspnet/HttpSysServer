@@ -16,6 +16,15 @@
     <PackageReference Include="Microsoft.Extensions.TaskCache.Sources" Version="$(AspNetCoreVersion)" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="$(CoreFxVersion)" />
+    <PackageReference Include="System.Threading.Overlapped" Version="$(CoreFxVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="1.2.0-*" />
+    <ProjectReference Include="..\..\..\Security\src\Microsoft.AspNetCore.Authentication.Impl\Microsoft.AspNetCore.Authentication.Impl.csproj" />
+    <PackageReference Include="Microsoft.Extensions.RuntimeEnvironment.Sources" Version="1.2.0-*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Extensions.TaskCache.Sources" Version="1.2.0-*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Net.Http.Headers" Version="1.2.0-*" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Security.Principal.Windows" Version="$(CoreFxVersion)" />
   </ItemGroup>
 

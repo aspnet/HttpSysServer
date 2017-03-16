@@ -6,7 +6,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Features.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Testing.xunit;
 using Xunit;
 
@@ -16,6 +20,55 @@ namespace Microsoft.AspNetCore.Server.HttpSys
     {
         private static bool AllowAnoymous = true;
         private static bool DenyAnoymous = false;
+
+        [Fact]
+        public async Task CanChallenge()
+        {
+            var server = CreateServer(
+                o =>
+                {
+                    o.Authentication.Schemes = AuthenticationSchemes.NTLM;
+                },
+                async context => {
+                    var result = await context.AuthenticateAsync("NTLM");
+                    if (result.Succeeded) {
+                        context.Response.StatusCode = 200;
+                    }
+                });
+            var response = await SendAsync(server, "https://example.com/authenticate/NTLM");
+            Assert.NotNull(response);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        private static TestServer CreateServer(Action<HttpSysOptions> configureHttpSys = null, Func<HttpContext, Task> testpath = null)
+        {
+            var builder = new WebHostBuilder()
+                .UseHttpSys(configureHttpSys)
+                .Configure(app =>
+                {
+                    app.UseAuthentication();
+                    app.Use(async (context, next) =>
+                    {
+                        if (testpath != null)
+                        {
+                            await testpath(context);
+                        }
+                        else
+                        {
+                            await next();
+                        }
+
+                    });
+                });
+            return new TestServer(builder);
+        }
+
+        private static async Task<HttpResponseMessage> SendAsync(TestServer server, string uri, string cookieHeader = null)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            return await server.CreateClient().SendAsync(request);
+        }
+
 
         [ConditionalTheory]
         [InlineData(AuthenticationSchemes.None)]
@@ -167,14 +220,15 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        [ConditionalTheory]
+        [ConditionalTheory(Skip = "No more descriptions")]
         [InlineData(AuthenticationSchemes.None)]
         [InlineData(AuthenticationSchemes.Negotiate)]
         [InlineData(AuthenticationSchemes.NTLM)]
         // [InlineData(AuthenticationSchemes.Digest)]
         [InlineData(AuthenticationSchemes.Basic)]
-        public async Task AuthTypes_GetSingleDescriptions(AuthenticationSchemes authType)
+        public Task AuthTypes_GetSingleDescriptions(AuthenticationSchemes authType)
         {
+<<<<<<< HEAD
             string address;
             using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
             {
@@ -190,17 +244,34 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     Assert.Equal(authType.ToString(), result.AuthenticationScheme);
                     Assert.Null(result.DisplayName);
                 }
+=======
+            //string address;
+            //using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
+            //{
+            //    var resultList = httpContext.Authentication.GetAuthenticationSchemes();
+            //    if (authType == AuthenticationSchemes.None)
+            //    {
+            //        Assert.Equal(0, resultList.Count());
+            //    }
+            //    else
+            //    {
+            //        Assert.Equal(1, resultList.Count());
+            //        var result = resultList.First();
+            //        Assert.Equal(authType.ToString(), result.AuthenticationScheme);
+            //        Assert.Equal("Windows:" + authType.ToString(), result.DisplayName);
+            //    }
+>>>>>>> PR fixes
 
                 return Task.FromResult(0);
-            }))
-            {
-                var response = await SendRequestAsync(address);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(0, response.Headers.WwwAuthenticate.Count);
-            }
+            //}))
+            //{
+            //    var response = await SendRequestAsync(address);
+            //    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            //    Assert.Equal(0, response.Headers.WwwAuthenticate.Count);
+            //}
         }
 
-        [ConditionalFact]
+        [ConditionalFact(Skip = "No more descriptions")]
         public async Task AuthTypes_GetMultipleDescriptions()
         {
             string address;
@@ -239,7 +310,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
                 foreach (var scheme in authTypeList)
                 {
-                    var authResults = await httpContext.Authentication.AuthenticateAsync(scheme);
+                    var authResults = await httpContext.AuthenticateAsync(scheme);
                     Assert.Null(authResults);
                 }
             }))
@@ -268,7 +339,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 var count = 0;
                 foreach (var scheme in authTypeList)
                 {
-                    var authResults = await httpContext.Authentication.AuthenticateAsync(scheme);
+                    var authResults = await httpContext.AuthenticateAsync(scheme);
                     if (authResults != null)
                     {
                         count++;
@@ -297,7 +368,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.Authentication.ChallengeAsync();
+                return httpContext.ChallengeAsync(authType.ToString());
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -323,7 +394,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
                 foreach (var scheme in authTypeList)
                 {
-                    await httpContext.Authentication.ChallengeAsync(scheme);
+                    await httpContext.ChallengeAsync(scheme);
                 }
             }))
             {
@@ -347,7 +418,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.Authentication.ChallengeAsync(authType.ToString());
+                return httpContext.ChallengeAsync(authType.ToString());
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -396,7 +467,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.Authentication.ForbidAsync(authType.ToString());
+                return httpContext.ForbidAsync(authType.ToString());
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -418,7 +489,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.True(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.Authentication.ChallengeAsync(authType.ToString());
+                return httpContext.ChallengeAsync(authType.ToString());
             }))
             {
                 var response = await SendRequestAsync(address, useDefaultCredentials: true);
@@ -441,7 +512,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.True(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.Authentication.ChallengeAsync();
+                return httpContext.ChallengeAsync(authType.ToString());
             }))
             {
                 var response = await SendRequestAsync(address, useDefaultCredentials: true);
@@ -464,7 +535,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.True(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.Authentication.ChallengeAsync(authType.ToString(), null, ChallengeBehavior.Unauthorized);
+                return httpContext.ChallengeAsync(authType.ToString(), null, ChallengeBehavior.Unauthorized);
             }))
             {
                 var response = await SendRequestAsync(address, useDefaultCredentials: true);
