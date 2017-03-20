@@ -22,6 +22,13 @@
     <PackageReference Include="Microsoft.Extensions.RuntimeEnvironment.Sources" Version="1.2.0-*" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.TaskCache.Sources" Version="1.2.0-*" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Net.Http.Headers" Version="1.2.0-*" />
+    <ProjectReference Include="..\..\..\Hosting\src\Microsoft.AspNetCore.Hosting\Microsoft.AspNetCore.Hosting.csproj" />
+    <ProjectReference Include="..\..\..\HttpAbstractions\src\Microsoft.AspNetCore.Authentication.Core\Microsoft.AspNetCore.Authentication.Core.csproj" />
+    <ProjectReference Include="..\..\..\Options\src\Microsoft.Extensions.Options\Microsoft.Extensions.Options.csproj" />
+    <PackageReference Include="Microsoft.Extensions.RuntimeEnvironment.Sources" Version="1.2.0-*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Extensions.TaskCache.Sources" Version="1.2.0-*" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Net.Http.Headers" Version="1.2.0-*" />
+    <PackageReference Include="System.Threading.Overlapped" Version="$(CoreFxVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">

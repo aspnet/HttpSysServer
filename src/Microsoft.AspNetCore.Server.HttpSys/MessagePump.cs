@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -32,7 +33,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private readonly ServerAddressesFeature _serverAddresses;
 
-        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory, IAuthenticationSchemeProvider authentication)
+        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory, IEnumerable<IAuthenticationSchemeProvider> authentication)
         {
             if (options == null)
             {
@@ -42,16 +43,20 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             {
                 throw new ArgumentNullException(nameof(loggerFactory));
             }
-            if (authentication == null)
-            {
-                throw new ArgumentNullException(nameof(authentication));
-            }
-
             _options = options.Value;
             Listener = new HttpSysListener(_options, loggerFactory);
             _logger = LogHelper.CreateLogger(loggerFactory, typeof(MessagePump));
 
-            AddSchemes(authentication, _options.Authentication.Schemes);
+            if (_options.Authentication.Schemes != AuthenticationSchemes.None)
+            {
+                var auth = authentication.FirstOrDefault();
+                if (auth == null)
+                {
+                    throw new InvalidOperationException("AddAuthentication() is required to use Authentication.");
+                }
+
+                AddSchemes(auth, _options.Authentication.Schemes);
+            }
 
             Features = new FeatureCollection();
             _serverAddresses = new ServerAddressesFeature();
