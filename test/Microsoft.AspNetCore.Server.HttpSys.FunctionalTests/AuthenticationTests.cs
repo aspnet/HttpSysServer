@@ -18,30 +18,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static bool DenyAnoymous = false;
 
         [ConditionalTheory]
-        [InlineData(AuthenticationSchemes.Negotiate)]
-        [InlineData(AuthenticationSchemes.NTLM)]
-        [InlineData(AuthenticationSchemes.Basic)]
-        [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
-        public async Task CanAuthenticate(AuthenticationSchemes authType)
-        {
-            var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, async httpContext =>
-            {
-                foreach (var scheme in authTypeList)
-                {
-                    var result = await httpContext.AuthenticateAsync(scheme);
-                    Assert.True(result.Succeeded);
-                }
-                httpContext.Response.StatusCode = 200;
-            }))
-            {
-                var response = await SendRequestAsync(address);
-                Assert.NotNull(response);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
-        }
-
-        [ConditionalTheory]
         [InlineData(AuthenticationSchemes.None)]
         [InlineData(AuthenticationSchemes.Negotiate)]
         [InlineData(AuthenticationSchemes.NTLM)]
@@ -173,7 +149,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /* AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         public async Task AuthTypes_RequireAuth_Success(AuthenticationSchemes authType)
         {
-            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, DenyAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
