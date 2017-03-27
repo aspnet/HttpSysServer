@@ -20,7 +20,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public Task<AuthenticateResult> AuthenticateAsync(AuthenticateContext context)
         {
             var identity = (ClaimsIdentity)_requestContext.User?.Identity;
-            return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), properties: null, authenticationScheme: context.AuthenticationScheme)));
+            var success = identity != null 
+                && identity.IsAuthenticated 
+                && string.Equals(context.AuthenticationScheme, identity.AuthenticationType, StringComparison.Ordinal);
+            return Task.FromResult(success
+                ? AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), properties: null, authenticationScheme: context.AuthenticationScheme))
+                : AuthenticateResult.None());
         }
 
         public Task ChallengeAsync(ChallengeContext context)

@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Testing.xunit;
 using Xunit;
 
@@ -19,21 +18,21 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static bool DenyAnoymous = false;
 
         [ConditionalTheory]
-        [InlineData(AuthenticationSchemes.None)]
         [InlineData(AuthenticationSchemes.Negotiate)]
         [InlineData(AuthenticationSchemes.NTLM)]
-        // [InlineData(AuthenticationSchemes.Digest)]
         [InlineData(AuthenticationSchemes.Basic)]
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
-        public async Task CanChallenge(AuthenticationSchemes authType)
+        public async Task CanAuthenticate(AuthenticationSchemes authType)
         {
-            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, async context =>
+            var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, async httpContext =>
             {
-                var result = await context.AuthenticateAsync("NTLM");
-                if (result.Succeeded)
+                foreach (var scheme in authTypeList)
                 {
-                    context.Response.StatusCode = 200;
+                    var result = await httpContext.AuthenticateAsync(scheme);
+                    Assert.True(result.Succeeded);
                 }
+                httpContext.Response.StatusCode = 200;
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -41,13 +40,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
-
-        private static async Task<HttpResponseMessage> SendAsync(TestServer server, string uri, string cookieHeader = null)
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            return await server.CreateClient().SendAsync(request);
-        }
-
 
         [ConditionalTheory]
         [InlineData(AuthenticationSchemes.None)]
@@ -58,8 +50,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         public async Task AuthTypes_AllowAnonymous_NoChallenge(AuthenticationSchemes authType)
         {
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -81,8 +72,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [FrameworkSkipCondition(RuntimeFrameworks.CoreCLR, SkipReason = "HttpClientHandler issue (https://github.com/dotnet/corefx/issues/5045).")]
         public async Task AuthType_RequireAuth_ChallengesAdded(AuthenticationSchemes authType)
         {
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, DenyAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, DenyAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 throw new NotImplementedException();
             }))
@@ -101,8 +91,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [FrameworkSkipCondition(RuntimeFrameworks.CoreCLR, SkipReason = "HttpClientHandler issue (https://github.com/dotnet/corefx/issues/5045).")]
         public async Task AuthType_AllowAnonymousButSpecify401_ChallengesAdded(AuthenticationSchemes authType)
         {
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -152,9 +141,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /* AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         public async Task AuthTypes_AllowAnonymousButSpecify401_Success(AuthenticationSchemes authType)
         {
-            string address;
             int requestId = 0;
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -188,8 +176,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /* AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         public async Task AuthTypes_RequireAuth_Success(AuthenticationSchemes authType)
         {
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, DenyAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -202,79 +189,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        [ConditionalTheory(Skip = "No more descriptions")]
-        [InlineData(AuthenticationSchemes.None)]
-        [InlineData(AuthenticationSchemes.Negotiate)]
-        [InlineData(AuthenticationSchemes.NTLM)]
-        // [InlineData(AuthenticationSchemes.Digest)]
-        [InlineData(AuthenticationSchemes.Basic)]
-        public Task AuthTypes_GetSingleDescriptions(AuthenticationSchemes authType)
-        {
-<<<<<<< HEAD
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
-            {
-                var resultList = httpContext.Authentication.GetAuthenticationSchemes();
-                if (authType == AuthenticationSchemes.None)
-                {
-                    Assert.Equal(0, resultList.Count());
-                }
-                else
-                {
-                    Assert.Equal(1, resultList.Count());
-                    var result = resultList.First();
-                    Assert.Equal(authType.ToString(), result.AuthenticationScheme);
-                    Assert.Null(result.DisplayName);
-                }
-=======
-            //string address;
-            //using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
-            //{
-            //    var resultList = httpContext.Authentication.GetAuthenticationSchemes();
-            //    if (authType == AuthenticationSchemes.None)
-            //    {
-            //        Assert.Equal(0, resultList.Count());
-            //    }
-            //    else
-            //    {
-            //        Assert.Equal(1, resultList.Count());
-            //        var result = resultList.First();
-            //        Assert.Equal(authType.ToString(), result.AuthenticationScheme);
-            //        Assert.Equal("Windows:" + authType.ToString(), result.DisplayName);
-            //    }
->>>>>>> PR fixes
-
-                return Task.FromResult(0);
-            //}))
-            //{
-            //    var response = await SendRequestAsync(address);
-            //    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            //    Assert.Equal(0, response.Headers.WwwAuthenticate.Count);
-            //}
-        }
-
-        [ConditionalFact(Skip = "No more descriptions")]
-        public async Task AuthTypes_GetMultipleDescriptions()
-        {
-            string address;
-            AuthenticationSchemes authType =
-                AuthenticationSchemes.Negotiate
-                | AuthenticationSchemes.NTLM
-                | /*AuthenticationSchemes.Digest
-                |*/ AuthenticationSchemes.Basic;
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
-            {
-                var resultList = httpContext.Authentication.GetAuthenticationSchemes();
-                Assert.Equal(3, resultList.Count());
-                return Task.FromResult(0);
-            }))
-            {
-                var response = await SendRequestAsync(address);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(0, response.Headers.WwwAuthenticate.Count);
-            }
-        }
-
         [ConditionalTheory]
         [InlineData(AuthenticationSchemes.Negotiate)]
         [InlineData(AuthenticationSchemes.NTLM)]
@@ -283,9 +197,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         public async Task AuthTypes_AuthenticateWithNoUser_NoResults(AuthenticationSchemes authType)
         {
-            string address;
             var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, async httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, async httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -293,7 +206,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 foreach (var scheme in authTypeList)
                 {
                     var authResults = await httpContext.AuthenticateAsync(scheme);
-                    Assert.Null(authResults);
+                    Assert.False(authResults.Succeeded);
+                    Assert.True(authResults.Nothing);
                 }
             }))
             {
@@ -311,9 +225,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         public async Task AuthTypes_AuthenticateWithUser_OneResult(AuthenticationSchemes authType)
         {
-            string address;
             var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            using (Utilities.CreateHttpAuthServer(authType, DenyAnoymous, out address, async httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, DenyAnoymous, out var address, out var baseAddress, async httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -322,7 +235,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 foreach (var scheme in authTypeList)
                 {
                     var authResults = await httpContext.AuthenticateAsync(scheme);
-                    if (authResults != null)
+                    if (authResults.Succeeded)
                     {
                         count++;
                     }
@@ -344,9 +257,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [FrameworkSkipCondition(RuntimeFrameworks.CoreCLR, SkipReason = "HttpClientHandler issue (https://github.com/dotnet/corefx/issues/5045).")]
         public async Task AuthTypes_ChallengeWithoutAuthTypes_AllChallengesSent(AuthenticationSchemes authType)
         {
-            string address;
             var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -369,9 +281,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [FrameworkSkipCondition(RuntimeFrameworks.CoreCLR, SkipReason = "HttpClientHandler issue (https://github.com/dotnet/corefx/issues/5045).")]
         public async Task AuthTypes_ChallengeWithAllAuthTypes_AllChallengesSent(AuthenticationSchemes authType)
         {
-            string address;
             var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            using (Utilities.CreateHttpAuthServer(authType, AllowAnoymous, out address, async httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, async httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -396,9 +307,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [FrameworkSkipCondition(RuntimeFrameworks.CoreCLR, SkipReason = "HttpClientHandler issue (https://github.com/dotnet/corefx/issues/5045).")]
         public async Task AuthTypes_ChallengeOneAuthType_OneChallengeSent(AuthenticationSchemes authType)
         {
-            string address;
             var authTypes = AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic;
-            using (Utilities.CreateHttpAuthServer(authTypes, AllowAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authTypes, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -420,11 +330,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Basic)]
         public async Task AuthTypes_ChallengeDisabledAuthType_Error(AuthenticationSchemes authType)
         {
-            string address;
             var authTypes = AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic;
             authTypes = authTypes & ~authType;
             var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            using (Utilities.CreateHttpAuthServer(authTypes, AllowAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -445,9 +354,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Basic)]
         public async Task AuthTypes_Forbid_Forbidden(AuthenticationSchemes authType)
         {
-            string address;
             var authTypes = AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic;
-            using (Utilities.CreateHttpAuthServer(authTypes, AllowAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authTypes, AllowAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -468,8 +376,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         // [InlineData(AuthenticationSchemes.Basic)] // Can't log in with UseDefaultCredentials
         public async Task AuthTypes_ChallengeAuthenticatedAuthType_Forbidden(AuthenticationSchemes authType)
         {
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, DenyAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, DenyAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -491,8 +398,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         // [InlineData(AuthenticationSchemes.Basic)] // Can't log in with UseDefaultCredentials
         public async Task AuthTypes_ChallengeAuthenticatedAuthTypeWithEmptyChallenge_Forbidden(AuthenticationSchemes authType)
         {
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, DenyAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, DenyAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
@@ -514,8 +420,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         // [InlineData(AuthenticationSchemes.Basic)] // Can't log in with UseDefaultCredentials
         public async Task AuthTypes_UnathorizedAuthenticatedAuthType_Unauthorized(AuthenticationSchemes authType)
         {
-            string address;
-            using (Utilities.CreateHttpAuthServer(authType, DenyAnoymous, out address, httpContext =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, DenyAnoymous, out var address, out var baseAddress, httpContext =>
             {
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
