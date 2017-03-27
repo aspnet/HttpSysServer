@@ -7,9 +7,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Testing.xunit;
 using Xunit;
@@ -21,46 +18,28 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static bool AllowAnoymous = true;
         private static bool DenyAnoymous = false;
 
-        [Fact]
-        public async Task CanChallenge()
+        [ConditionalTheory]
+        [InlineData(AuthenticationSchemes.None)]
+        [InlineData(AuthenticationSchemes.Negotiate)]
+        [InlineData(AuthenticationSchemes.NTLM)]
+        // [InlineData(AuthenticationSchemes.Digest)]
+        [InlineData(AuthenticationSchemes.Basic)]
+        [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
+        public async Task CanChallenge(AuthenticationSchemes authType)
         {
-            var server = CreateServer(
-                o =>
+            using (var server = Utilities.CreateDynamicHost(string.Empty, authType, AllowAnoymous, out var address, out var baseAddress, async context =>
+            {
+                var result = await context.AuthenticateAsync("NTLM");
+                if (result.Succeeded)
                 {
-                    o.Authentication.Schemes = AuthenticationSchemes.NTLM;
-                },
-                async context => {
-                    var result = await context.AuthenticateAsync("NTLM");
-                    if (result.Succeeded) {
-                        context.Response.StatusCode = 200;
-                    }
-                });
-            var response = await SendAsync(server, "https://example.com/authenticate/NTLM");
-            Assert.NotNull(response);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        private static TestServer CreateServer(Action<HttpSysOptions> configureHttpSys = null, Func<HttpContext, Task> testpath = null)
-        {
-            var builder = new WebHostBuilder()
-                .UseHttpSys(configureHttpSys)
-                .Configure(app =>
-                {
-                    app.UseAuthentication();
-                    app.Use(async (context, next) =>
-                    {
-                        if (testpath != null)
-                        {
-                            await testpath(context);
-                        }
-                        else
-                        {
-                            await next();
-                        }
-
-                    });
-                });
-            return new TestServer(builder);
+                    context.Response.StatusCode = 200;
+                }
+            }))
+            {
+                var response = await SendRequestAsync(address);
+                Assert.NotNull(response);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
         }
 
         private static async Task<HttpResponseMessage> SendAsync(TestServer server, string uri, string cookieHeader = null)
