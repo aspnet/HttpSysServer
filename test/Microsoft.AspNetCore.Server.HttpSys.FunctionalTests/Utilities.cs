@@ -60,7 +60,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                             options.Authentication.Schemes = authType;
                             options.Authentication.AllowAnonymous = allowAnonymous;
                         })
-                        .ConfigureServices(s => s.AddAuthentication())
+                        .ConfigureServices(s => s.AddAuthenticationCore())
                         .Configure(appBuilder => appBuilder.Run(app));
 
                     var host = builder.Build();

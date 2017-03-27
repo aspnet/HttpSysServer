@@ -52,7 +52,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private string _traceIdentitfier;
         private X509Certificate2 _clientCert;
         private ClaimsPrincipal _user;
-        private IAuthenticationHandler _authHandler;
         private CancellationToken _disconnectToken;
         private Stream _responseStream;
         private IHeaderDictionary _responseHeaders;
@@ -68,7 +67,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             _requestContext = requestContext;
             _features = new FeatureCollection(new StandardFeatureCollection(this));
-            //_authHandler = new AuthenticationHandler(requestContext);
             _enableResponseCaching = enableResponseCaching;
 
             // Pre-initialize any fields that are not lazy at the lower level.
@@ -446,11 +444,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             set { _user = value; }
         }
 
-        IAuthenticationHandler IHttpAuthenticationFeature.Handler
-        {
-            get { return _authHandler; }
-            set { _authHandler = value; }
-        }
+        [Obsolete("See https://go.microsoft.com/fwlink/?linkid=845470")]
+        IAuthenticationHandler IHttpAuthenticationFeature.Handler { get; set; }
 
         string IHttpRequestIdentifierFeature.TraceIdentifier
         {
