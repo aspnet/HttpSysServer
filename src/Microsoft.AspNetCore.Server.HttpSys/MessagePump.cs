@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private void AddScheme(IAuthenticationSchemeProvider authentication, string scheme)
         {
-            authentication.AddScheme(new AuthenticationScheme(scheme, typeof(AuthenticationHandler), new Dictionary<string, object>()));
+            authentication.AddScheme(new AuthenticationScheme(scheme, typeof(AuthenticationHandler)));
         }
 
         private void AddSchemes(IAuthenticationSchemeProvider authentication, AuthenticationSchemes schemes)

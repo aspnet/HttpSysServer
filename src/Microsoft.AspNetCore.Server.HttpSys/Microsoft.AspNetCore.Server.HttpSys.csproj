@@ -17,7 +17,7 @@
     <ProjectReference Include="..\..\..\Options\src\Microsoft.Extensions.Options\Microsoft.Extensions.Options.csproj" />
     <PackageReference Include="Microsoft.Extensions.RuntimeEnvironment.Sources" Version="1.2.0-*" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.TaskCache.Sources" Version="1.2.0-*" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Net.Http.Headers" Version="1.2.0-*" />
+    <ProjectReference Include="..\..\..\HttpAbstractions\src\Microsoft.Net.Http.Headers\Microsoft.Net.Http.Headers.csproj" />
     <PackageReference Include="System.Threading.Overlapped" Version="$(CoreFxVersion)" />
   </ItemGroup>
 
