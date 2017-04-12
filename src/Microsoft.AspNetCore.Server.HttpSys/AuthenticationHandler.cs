@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -19,21 +20,21 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public Task<AuthenticateResult> AuthenticateAsync(AuthenticateContext context)
         {
             var identity = _requestContext.User?.Identity;
-            var success = identity != null 
-                && identity.IsAuthenticated 
-                && string.Equals(context.AuthenticationScheme, identity.AuthenticationType, StringComparison.Ordinal);
-            return Task.FromResult(success
-                ? AuthenticateResult.Success(new AuthenticationTicket(_requestContext.User, properties: null, authenticationScheme: context.AuthenticationScheme))
-                : AuthenticateResult.None());
+            if (identity != null && identity.IsAuthenticated)
+            {
+                foreach (var scheme in ListEnabledAuthSchemes())
+                {
+                    if (string.Equals(context.AuthenticationScheme, identity.AuthenticationType, StringComparison.Ordinal))
+                    {
+                        return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(_requestContext.User, properties: null, authenticationScheme: context.AuthenticationScheme)));
+                    }
+                }
+            }
+            return Task.FromResult(AuthenticateResult.None());
         }
 
         public Task ChallengeAsync(ChallengeContext context)
         {
-            if (!Enum.TryParse<AuthenticationSchemes>(context.AuthenticationScheme, out var scheme))
-            {
-                throw new NotSupportedException(context.AuthenticationScheme);
-            }
-
             switch (context.Behavior)
             {
                 case ChallengeBehavior.Forbidden:
@@ -41,7 +42,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     break;
                 case ChallengeBehavior.Unauthorized:
                     _requestContext.Response.StatusCode = 401;
-                    _customChallenges |= scheme;
+                    foreach (var scheme in ListEnabledAuthSchemes())
+                    {
+                        _customChallenges |= scheme;
+                    }
                     break;
                 case ChallengeBehavior.Automatic:
                     var identity = (ClaimsIdentity)_requestContext.User?.Identity;
@@ -53,7 +57,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     else
                     {
                         _requestContext.Response.StatusCode = 401;
-                        _customChallenges |= scheme;
+                        foreach (var scheme in ListEnabledAuthSchemes())
+                        {
+                            _customChallenges |= scheme;
+                        }
                     }
                     break;
                 default:
@@ -87,6 +94,33 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public Task SignOutAsync(SignOutContext context)
         {
             return TaskCache.CompletedTask;
+        }
+
+        private IEnumerable<AuthenticationSchemes> ListEnabledAuthSchemes()
+        {
+            // Order by strength.
+            if ((_authSchemes & AuthenticationSchemes.Kerberos) == AuthenticationSchemes.Kerberos)
+            {
+                yield return AuthenticationSchemes.Kerberos;
+            }
+            if ((_authSchemes & AuthenticationSchemes.Negotiate) == AuthenticationSchemes.Negotiate)
+            {
+                yield return AuthenticationSchemes.Negotiate;
+            }
+            if ((_authSchemes & AuthenticationSchemes.NTLM) == AuthenticationSchemes.NTLM)
+            {
+                yield return AuthenticationSchemes.NTLM;
+            }
+            /*if ((_authSchemes & AuthenticationSchemes.Digest) == AuthenticationSchemes.Digest)
+            {
+                // TODO:
+                throw new NotImplementedException("Digest challenge generation has not been implemented.");
+                yield return AuthenticationSchemes.Digest;
+            }*/
+            if ((_authSchemes & AuthenticationSchemes.Basic) == AuthenticationSchemes.Basic)
+            {
+                yield return AuthenticationSchemes.Basic;
+            }
         }
     }
 }

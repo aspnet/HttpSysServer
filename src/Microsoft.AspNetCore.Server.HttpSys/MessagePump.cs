@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     throw new InvalidOperationException("AddAuthentication() is required to use Authentication.");
                 }
 
-                AddSchemes(auth, _options.Authentication.Schemes);
+                auth.AddScheme(new AuthenticationScheme("Windows", typeof(AuthenticationHandler)));
             }
 
             Features = new FeatureCollection();
@@ -99,8 +99,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        public Task StartAsync<TContext>(IHttpApplication<TContext> application, CancellationToken cancellationToken)
-
+        public void Start<TContext>(IHttpApplication<TContext> application)
         {
             if (application == null)
             {
