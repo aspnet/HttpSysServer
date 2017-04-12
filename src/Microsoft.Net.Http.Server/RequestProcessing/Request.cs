@@ -7,6 +7,7 @@ using System.IO;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -303,6 +304,7 @@ namespace Microsoft.Net.Http.Server
             // TODO: Verbose log
             _isDisposed = true;
             _nativeRequestContext.Dispose();
+            (User?.Identity as WindowsIdentity)?.Dispose();
             if (_nativeStream != null)
             {
                 _nativeStream.Dispose();
