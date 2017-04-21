@@ -57,7 +57,7 @@ namespace Microsoft.Net.Http.Server
             }
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/aspnet/HttpSysServer/issues/263")]
         public async Task Caching_SetTtlWithContentType_Cached()
         {
             string address;
@@ -471,7 +471,7 @@ namespace Microsoft.Net.Http.Server
             }
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/aspnet/HttpSysServer/issues/263")]
         public async Task Caching_SendFileWithFullContentLength_Cached()
         {
             string address;
@@ -502,7 +502,7 @@ namespace Microsoft.Net.Http.Server
             }
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/aspnet/HttpSysServer/issues/263")]
         public async Task Caching_SetTtlAndStatusCode_Cached()
         {
             string address;

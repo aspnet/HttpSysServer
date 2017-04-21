@@ -138,7 +138,7 @@ namespace Microsoft.Net.Http.Server
             }
         }
 
-        [Fact]
+        [Fact(Skip = "https://github.com/aspnet/HttpSysServer/issues/263")]
         public async Task ResponseBody_WriteContentLengthNotEnoughWritten_Aborts()
         {
             string address;
