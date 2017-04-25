@@ -16,17 +16,18 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private RequestContext _requestContext;
         private AuthenticationSchemes _authSchemes;
         private AuthenticationSchemes _customChallenges;
+        private AuthenticationScheme _scheme;
 
-        public Task<AuthenticateResult> AuthenticateAsync(AuthenticateContext context)
+        public Task<AuthenticateResult> AuthenticateAsync()
         {
             var identity = _requestContext.User?.Identity;
             if (identity != null && identity.IsAuthenticated)
             {
                 foreach (var scheme in ListEnabledAuthSchemes())
                 {
-                    if (string.Equals(context.AuthenticationScheme, identity.AuthenticationType, StringComparison.Ordinal))
+                    if (string.Equals(scheme.ToString(), identity.AuthenticationType, StringComparison.Ordinal))
                     {
-                        return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(_requestContext.User, properties: null, authenticationScheme: context.AuthenticationScheme)));
+                        return Task.FromResult(AuthenticateResult.Success(new AuthenticationTicket(_requestContext.User, properties: null, authenticationScheme: _scheme.Name)));
                     }
                 }
             }
@@ -49,10 +50,16 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     break;
                 case ChallengeBehavior.Automatic:
                     var identity = (ClaimsIdentity)_requestContext.User?.Identity;
-                    if (identity != null && identity.IsAuthenticated
-                        && (string.Equals(identity.AuthenticationType, context.AuthenticationScheme, StringComparison.Ordinal)))
+                    if (identity != null && identity.IsAuthenticated)
                     {
-                        _requestContext.Response.StatusCode = 403;
+                        foreach (var scheme in ListEnabledAuthSchemes())
+                        {
+                            if (string.Equals(identity.AuthenticationType, scheme.ToString(), StringComparison.Ordinal))
+                            {
+                                _requestContext.Response.StatusCode = 403;
+                                break;
+                            }
+                        }
                     }
                     else
                     {
@@ -74,6 +81,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         public Task InitializeAsync(AuthenticationScheme scheme, HttpContext context)
         {
+            _scheme = scheme;
             _requestContext = context.Features.Get<RequestContext>();
 
             if (_requestContext == null)

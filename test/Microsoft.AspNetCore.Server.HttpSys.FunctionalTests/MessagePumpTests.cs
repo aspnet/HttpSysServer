@@ -20,7 +20,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             var serverAddress = "http://localhost:11001/";
             var overrideAddress = "http://localhost:11002/";
 
-            using (var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory()))
+            using (var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new AuthenticationSchemeProvider[0]))
             {
                 var serverAddressesFeature = server.Features.Get<IServerAddressesFeature>();
                 serverAddressesFeature.Addresses.Add(overrideAddress);
@@ -42,7 +42,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             var serverAddress = "http://localhost:11002/";
 
-            using (var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory()))
+            using (var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new AuthenticationSchemeProvider[0]))
             {
                 var serverAddressesFeature = server.Features.Get<IServerAddressesFeature>();
                 serverAddressesFeature.Addresses.Add(overrideAddress);
@@ -59,7 +59,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             var serverAddress = "http://localhost:11002/";
 
-            using (var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory()))
+            using (var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new AuthenticationSchemeProvider[0]))
             {
                 var serverAddressesFeature = server.Features.Get<IServerAddressesFeature>();
                 serverAddressesFeature.PreferHostingUrls = true;
