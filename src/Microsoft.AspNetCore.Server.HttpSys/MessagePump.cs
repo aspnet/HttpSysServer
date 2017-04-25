@@ -2,12 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http.Features;
@@ -55,7 +55,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     throw new InvalidOperationException("AddAuthentication() is required to use Authentication.");
                 }
 
-                auth.AddScheme(new AuthenticationScheme("Windows", typeof(AuthenticationHandler)));
+                auth.AddScheme(new AuthenticationScheme("Windows", displayName: null, handlerType: typeof(AuthenticationHandler)));
             }
 
             Features = new FeatureCollection();
@@ -74,32 +74,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         public IFeatureCollection Features { get; }
 
-        private void AddScheme(IAuthenticationSchemeProvider authentication, string scheme)
-        {
-            authentication.AddScheme(new AuthenticationScheme(scheme, typeof(AuthenticationHandler)));
-        }
-
-        private void AddSchemes(IAuthenticationSchemeProvider authentication, AuthenticationSchemes schemes)
-        {
-            if ((schemes & AuthenticationSchemes.Kerberos) == AuthenticationSchemes.Kerberos)
-            {
-                AddScheme(authentication, "Kerberos");
-            }
-            if ((schemes & AuthenticationSchemes.Negotiate) == AuthenticationSchemes.Negotiate)
-            {
-                AddScheme(authentication, "Negotiate");
-            }
-            if ((schemes & AuthenticationSchemes.NTLM) == AuthenticationSchemes.NTLM)
-            {
-                AddScheme(authentication, "NTLM");
-            }
-            if ((schemes & AuthenticationSchemes.Basic) == AuthenticationSchemes.Basic)
-            {
-                AddScheme(authentication, "Basic");
-            }
-        }
-
-        public void Start<TContext>(IHttpApplication<TContext> application)
+        public Task StartAsync<TContext>(IHttpApplication<TContext> application, CancellationToken cancellationToken)
         {
             if (application == null)
             {
