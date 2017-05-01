@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 {
                     auth.AddScheme(new AuthenticationScheme("Windows", displayName: null, handlerType: typeof(AuthenticationHandler)));
                 }
-                else if (_options.Authentication.Schemes != AuthenticationSchemes.None && _options.Authentication.AllowAnonymous)
+                else if (_options.Authentication.AllowAnonymous)
                 {
                     throw new InvalidOperationException("AddAuthentication() is required to use Authentication.");
                 }
