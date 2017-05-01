@@ -50,8 +50,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             if (_options.Authentication.Schemes != AuthenticationSchemes.None)
             {
                 var auth = authentication.FirstOrDefault();
-
-                
                 if (auth != null)
                 {
                     auth.AddScheme(new AuthenticationScheme("Windows", displayName: null, handlerType: typeof(AuthenticationHandler)));
