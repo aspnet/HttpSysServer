@@ -444,7 +444,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             set { _user = value; }
         }
 
-        [Obsolete("See https://go.microsoft.com/fwlink/?linkid=845470")]
         IAuthenticationHandler IHttpAuthenticationFeature.Handler { get; set; }
 
         string IHttpRequestIdentifierFeature.TraceIdentifier
