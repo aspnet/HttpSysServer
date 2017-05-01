@@ -239,6 +239,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         // [InlineData(AuthenticationSchemes.Digest)]
         [InlineData(AuthenticationSchemes.Basic)]
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
+        [FrameworkSkipCondition(RuntimeFrameworks.CoreCLR, SkipReason = "HttpClientHandler issue (https://github.com/dotnet/corefx/issues/5045).")]
         public async Task AuthTypes_ChallengeWithAllAuthTypes_AllChallengesSent(AuthenticationSchemes authType)
         {
             var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
