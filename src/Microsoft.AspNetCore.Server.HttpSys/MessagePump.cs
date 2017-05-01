@@ -50,12 +50,16 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             if (_options.Authentication.Schemes != AuthenticationSchemes.None)
             {
                 var auth = authentication.FirstOrDefault();
-                if (auth == null)
+
+                
+                if (auth != null)
+                {
+                    auth.AddScheme(new AuthenticationScheme("Windows", displayName: null, handlerType: typeof(AuthenticationHandler)));
+                }
+                else if (_options.Authentication.Schemes != AuthenticationSchemes.None && _options.Authentication.AllowAnonymous)
                 {
                     throw new InvalidOperationException("AddAuthentication() is required to use Authentication.");
                 }
-
-                auth.AddScheme(new AuthenticationScheme("Windows", displayName: null, handlerType: typeof(AuthenticationHandler)));
             }
 
             Features = new FeatureCollection();

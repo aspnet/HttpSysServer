@@ -42,6 +42,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             return CreateDynamicHttpServer(string.Empty, authType, allowAnonymous, out root, out baseAddress, app);
         }
 
+        internal static IWebHost CreateDynamicHost(AuthenticationSchemes authType, bool allowAnonymous, out string root, RequestDelegate app)
+            => CreateDynamicHost(string.Empty, authType, allowAnonymous, out root, out var baseAddress, app);
+
         internal static IWebHost CreateDynamicHost(string basePath, AuthenticationSchemes authType, bool allowAnonymous, out string root, out string baseAddress, RequestDelegate app)
         {
             lock (PortLock)
