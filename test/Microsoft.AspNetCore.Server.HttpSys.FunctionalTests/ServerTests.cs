@@ -288,7 +288,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             string address;
             using (Utilities.CreateHttpServer(out address, httpContext => Task.FromResult(0))) { }
 
-            var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new IAuthenticationSchemeProvider[0]);
+            var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new AuthenticationSchemeProvider(Options.Create(new AuthenticationOptions())));
             server.Listener.Options.UrlPrefixes.Add(UrlPrefix.Create(address));
             server.Listener.Options.RequestQueueLimit = 1001;
 

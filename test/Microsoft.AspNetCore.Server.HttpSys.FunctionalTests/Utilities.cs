@@ -60,7 +60,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                             options.Authentication.Schemes = authType;
                             options.Authentication.AllowAnonymous = allowAnonymous;
                         })
-                        .ConfigureServices(s => s.AddAuthenticationCore())
                         .Configure(appBuilder => appBuilder.Run(app));
 
                     var host = builder.Build();
@@ -93,7 +92,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     root = prefix.Scheme + "://" + prefix.Host + ":" + prefix.Port;
                     baseAddress = prefix.ToString();
 
-                    var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new IAuthenticationSchemeProvider[0]);
+                    var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new AuthenticationSchemeProvider(Options.Create(new AuthenticationOptions())));
                     server.Features.Get<IServerAddressesFeature>().Addresses.Add(baseAddress);
                     server.Listener.Options.Authentication.Schemes = authType;
                     server.Listener.Options.Authentication.AllowAnonymous = allowAnonymous;
@@ -118,7 +117,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         internal static IServer CreateServer(string scheme, string host, int port, string path, RequestDelegate app)
         {
-            var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new IAuthenticationSchemeProvider[0]);
+            var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new AuthenticationSchemeProvider(Options.Create(new AuthenticationOptions())));
             server.Features.Get<IServerAddressesFeature>().Addresses.Add(UrlPrefix.Create(scheme, host, port, path).ToString());
             server.StartAsync(new DummyApplication(app), CancellationToken.None).Wait();
             return server;

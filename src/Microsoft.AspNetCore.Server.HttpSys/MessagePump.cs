@@ -33,7 +33,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private readonly ServerAddressesFeature _serverAddresses;
 
-        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory, IEnumerable<IAuthenticationSchemeProvider> authentication)
+        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory, IAuthenticationSchemeProvider authentication)
         {
             if (options == null)
             {
@@ -49,13 +49,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             if (_options.Authentication.Schemes != AuthenticationSchemes.None)
             {
-                var auth = authentication.FirstOrDefault();
-                if (auth == null)
-                {
-                    throw new InvalidOperationException("AddAuthentication() is required to use Authentication.");
-                }
-
-                auth.AddScheme(new AuthenticationScheme("Windows", displayName: null, handlerType: typeof(AuthenticationHandler)));
+                authentication.AddScheme(new AuthenticationScheme(HttpSysDefaults.AuthenticationScheme, displayName: null, handlerType: typeof(AuthenticationHandler)));
             }
 
             Features = new FeatureCollection();
