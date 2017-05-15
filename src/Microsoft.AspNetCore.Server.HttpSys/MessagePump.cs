@@ -2,9 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
@@ -33,7 +31,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private readonly ServerAddressesFeature _serverAddresses;
 
-        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory, IEnumerable<IAuthenticationSchemeProvider> authentication)
+        public MessagePump(IOptions<HttpSysOptions> options, ILoggerFactory loggerFactory, IAuthenticationSchemeProvider authentication)
         {
             if (options == null)
             {
@@ -49,15 +47,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             if (_options.Authentication.Schemes != AuthenticationSchemes.None)
             {
-                var auth = authentication.FirstOrDefault();
-                if (auth != null)
-                {
-                    auth.AddScheme(new AuthenticationScheme("Windows", displayName: null, handlerType: typeof(AuthenticationHandler)));
-                }
-                else if (_options.Authentication.AllowAnonymous)
-                {
-                    throw new InvalidOperationException("AddAuthentication() is required to use Authentication.");
-                }
+                authentication.AddScheme(new AuthenticationScheme(HttpSysDefaults.AuthenticationScheme, displayName: null, handlerType: typeof(AuthenticationHandler)));
             }
 
             Features = new FeatureCollection();

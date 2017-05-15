@@ -176,7 +176,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                var authResults = await httpContext.AuthenticateAsync("Windows");
+                var authResults = await httpContext.AuthenticateAsync(HttpSysDefaults.AuthenticationScheme);
                 Assert.False(authResults.Succeeded);
                 Assert.True(authResults.Nothing);
             }))
@@ -201,7 +201,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.True(httpContext.User.Identity.IsAuthenticated);
-                var authResults = await httpContext.AuthenticateAsync("Windows");
+                var authResults = await httpContext.AuthenticateAsync(HttpSysDefaults.AuthenticationScheme);
                 Assert.True(authResults.Succeeded);
             }))
             {
@@ -224,7 +224,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.ChallengeAsync("Windows");
+                return httpContext.ChallengeAsync(HttpSysDefaults.AuthenticationScheme);
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -239,7 +239,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         // [InlineData(AuthenticationSchemes.Digest)]
         [InlineData(AuthenticationSchemes.Basic)]
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
-        [FrameworkSkipCondition(RuntimeFrameworks.CoreCLR, SkipReason = "HttpClientHandler issue (https://github.com/dotnet/corefx/issues/5045).")]
         public async Task AuthTypes_ChallengeWithAllAuthTypes_AllChallengesSent(AuthenticationSchemes authType)
         {
             var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -248,7 +247,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                await httpContext.ChallengeAsync("Windows");
+                await httpContext.ChallengeAsync(HttpSysDefaults.AuthenticationScheme);
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -270,7 +269,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.ChallengeAsync("Windows");
+                return httpContext.ChallengeAsync(HttpSysDefaults.AuthenticationScheme);
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -279,14 +278,13 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        [ConditionalTheory]
+        [ConditionalTheory(Skip = "HttpClientHandler issue (https://github.com/aspnet/ServerTests/issues/82).")]
         [InlineData(AuthenticationSchemes.Negotiate)]
         [InlineData(AuthenticationSchemes.NTLM)]
         // [InlineData(AuthenticationSchemes.Digest)]
         [InlineData(AuthenticationSchemes.Basic)]
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM)]
-        [InlineData(AuthenticationSchemes.NTLM | AuthenticationSchemes.Basic)]
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.Basic)]
         [InlineData(AuthenticationSchemes.NTLM | AuthenticationSchemes.Basic)]
         public async Task AuthTypes_ChallengeWillAskForAllEnabledSchemes(AuthenticationSchemes authType)
@@ -297,7 +295,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.ChallengeAsync("Windows");
+                return httpContext.ChallengeAsync(HttpSysDefaults.AuthenticationScheme);
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -319,7 +317,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.False(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.ForbidAsync("Windows");
+                return httpContext.ForbidAsync(HttpSysDefaults.AuthenticationScheme);
             }))
             {
                 var response = await SendRequestAsync(address);
@@ -340,7 +338,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.True(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.ChallengeAsync("Windows");
+                return httpContext.ChallengeAsync(HttpSysDefaults.AuthenticationScheme);
             }))
             {
                 var response = await SendRequestAsync(address, useDefaultCredentials: true);
@@ -362,7 +360,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.True(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.ChallengeAsync("Windows");
+                return httpContext.ChallengeAsync(HttpSysDefaults.AuthenticationScheme);
             }))
             {
                 var response = await SendRequestAsync(address, useDefaultCredentials: true);
@@ -384,7 +382,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.NotNull(httpContext.User);
                 Assert.NotNull(httpContext.User.Identity);
                 Assert.True(httpContext.User.Identity.IsAuthenticated);
-                return httpContext.ChallengeAsync("Windows", null, ChallengeBehavior.Unauthorized);
+                return httpContext.ChallengeAsync(HttpSysDefaults.AuthenticationScheme, null, ChallengeBehavior.Unauthorized);
             }))
             {
                 var response = await SendRequestAsync(address, useDefaultCredentials: true);
