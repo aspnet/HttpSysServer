@@ -307,7 +307,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             var dynamicServer = Utilities.CreateHttpServerReturnRoot("/", out root, app);
             dynamicServer.Dispose();
             var rootUri = new Uri(root);
-            var server = new MessagePump(Options.Create(new HttpSysOptions()), new LoggerFactory(), new AuthenticationSchemeProvider(Options.Create(new AuthenticationOptions())));
+            var server = Utilities.CreatePump();
 
             foreach (string path in new[] { "/", "/11", "/2/3", "/2", "/11/2" })
             {

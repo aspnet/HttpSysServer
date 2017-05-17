@@ -195,7 +195,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [InlineData(AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic)]
         public async Task AuthTypes_AuthenticateWithUser_OneResult(AuthenticationSchemes authType)
         {
-            var authTypeList = authType.ToString().Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             using (var server = Utilities.CreateDynamicHost(authType, DenyAnoymous, out var address, async httpContext =>
             {
                 Assert.NotNull(httpContext.User);
@@ -256,12 +255,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        [ConditionalTheory(Skip = "HttpClientHandler issue (https://github.com/aspnet/ServerTests/issues/82).")]
-        [InlineData(AuthenticationSchemes.Negotiate)]
-        [InlineData(AuthenticationSchemes.NTLM)]
-        // [InlineData(AuthenticationSchemes.Digest)]
-        [InlineData(AuthenticationSchemes.Basic)]
-        public async Task AuthTypes_ChallengeOneAuthType_OneChallengeSent(AuthenticationSchemes authType)
+        [Fact(Skip = "HttpClientHandler issue (https://github.com/aspnet/ServerTests/issues/82).")]
+        public async Task AuthTypes_OneChallengeSent()
         {
             var authTypes = AuthenticationSchemes.Negotiate | AuthenticationSchemes.NTLM | /*AuthenticationSchemes.Digest |*/ AuthenticationSchemes.Basic;
             using (var server = Utilities.CreateDynamicHost(authTypes, AllowAnoymous, out var address, httpContext =>
