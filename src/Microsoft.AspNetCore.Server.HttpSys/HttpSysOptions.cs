@@ -30,7 +30,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         /// </summary>
         public bool EnableResponseCaching { get; set; } = true;
 
-        public bool AttachToExistingRequestQueue { get; set; }
+        public RequestQueueMode Mode { get; set; }
 
         public string RequestQueueName { get; set; }
 

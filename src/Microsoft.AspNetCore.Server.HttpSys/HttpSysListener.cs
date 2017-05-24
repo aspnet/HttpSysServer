@@ -76,7 +76,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             {
                 _serverSession = new ServerSession();
                 _urlGroup = new UrlGroup(_serverSession, Logger);
-                _requestQueue = new RequestQueue(_urlGroup, Options.RequestQueueName, Options.AttachToExistingRequestQueue, Logger);
+                _requestQueue = new RequestQueue(_urlGroup, Options.RequestQueueName, Options.Mode, Logger);
 
                 _disconnectListener = new DisconnectListener(_requestQueue, Logger);
             }
@@ -144,7 +144,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         return;
                     }
 
-                    if (!Options.AttachToExistingRequestQueue)
+                    if (RequestQueue.Created)
                     {
                         Options.Authentication.SetUrlGroupSecurity(UrlGroup);
                         Options.Timeouts.SetUrlGroupTimeouts(UrlGroup);
@@ -190,7 +190,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         return;
                     }
 
-                    if (!Options.AttachToExistingRequestQueue)
+                    if (RequestQueue.Created)
                     {
                         Options.UrlPrefixes.UnregisterAllPrefixes();
                     }

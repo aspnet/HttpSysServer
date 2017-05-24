@@ -62,7 +62,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Path = string.Empty;
             }
             // TODO: How to make base paths work when the prefix is defined elsewhere? Loop and test?
-            else if (RequestContext.Server.Options.AttachToExistingRequestQueue || prefix == null)
+            else if (!RequestContext.Server.RequestQueue.Created || prefix == null)
             {
                 PathBase = string.Empty;
                 Path = originalPath;

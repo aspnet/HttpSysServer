@@ -13,25 +13,44 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static readonly int BindingInfoSize =
             Marshal.SizeOf<HttpApi.HTTP_BINDING_INFO>();
 
-        private readonly bool _attachToExistingQueue;
+        private readonly RequestQueueMode _mode;
         private readonly UrlGroup _urlGroup;
         private readonly ILogger _logger;
         private bool _disposed;
 
         // Open existing queue
-        internal RequestQueue(UrlGroup urlGroup, string queueName, bool attachToExistingQueue, ILogger logger)
+        internal RequestQueue(UrlGroup urlGroup, string queueName, RequestQueueMode mode, ILogger logger)
         {
-            _attachToExistingQueue = attachToExistingQueue;
+            _mode = mode;
             _urlGroup = urlGroup;
             _logger = logger;
 
-            var flags = _attachToExistingQueue ? HttpApi.HTTP_CREATE_REQUEST_QUEUE_FLAG.OpenExisting : HttpApi.HTTP_CREATE_REQUEST_QUEUE_FLAG.None;
+            // Default is CreateAndListen
+            var flags = HttpApi.HTTP_CREATE_REQUEST_QUEUE_FLAG.None;
+            Created = true;
+            if (_mode == RequestQueueMode.AttachToExisting || _mode == RequestQueueMode.AttachOrCreate)
+            {
+                flags = HttpApi.HTTP_CREATE_REQUEST_QUEUE_FLAG.OpenExisting;
+                Created = false;
+            }
+            else if (_mode == RequestQueueMode.Controler)
+            {
+                flags = HttpApi.HTTP_CREATE_REQUEST_QUEUE_FLAG.Controller;
+            }
 
-            HttpRequestQueueV2Handle requestQueueHandle = null;
             var statusCode = HttpApi.HttpCreateRequestQueue(
-                    HttpApi.Version, queueName, null, flags, out requestQueueHandle);
+                    HttpApi.Version, queueName, null, flags, out var requestQueueHandle);
 
-            if (attachToExistingQueue && statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_FILE_NOT_FOUND)
+            if (_mode == RequestQueueMode.AttachOrCreate && statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_FILE_NOT_FOUND)
+            {
+                // Tried to attach, but it didn't exist so create it.
+                Created = true;
+                flags = HttpApi.HTTP_CREATE_REQUEST_QUEUE_FLAG.None;
+                statusCode = HttpApi.HttpCreateRequestQueue(
+                        HttpApi.Version, queueName, null, flags, out requestQueueHandle);
+            }
+
+            if (flags == HttpApi.HTTP_CREATE_REQUEST_QUEUE_FLAG.OpenExisting && statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_FILE_NOT_FOUND)
             {
                 throw new HttpSysException((int)statusCode, $"Failed to attach to the given request queue '{queueName}', the queue could not be found.");
             }
@@ -45,7 +64,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
 
             // Disabling callbacks when IO operation completes synchronously (returns ErrorCodes.ERROR_SUCCESS)
-            if (HttpSysListener.SkipIOCPCallbackOnSuccess &&
+            if (_mode != RequestQueueMode.Controler && HttpSysListener.SkipIOCPCallbackOnSuccess &&
                 !UnsafeNclNativeMethods.SetFileCompletionNotificationModes(
                     requestQueueHandle,
                     UnsafeNclNativeMethods.FileCompletionNotificationModes.SkipCompletionPortOnSuccess |
@@ -59,6 +78,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             BoundHandle = ThreadPoolBoundHandle.BindHandle(Handle);
         }
 
+        internal bool Created { get; }
+
         internal SafeHandle Handle { get; }
         internal ThreadPoolBoundHandle BoundHandle { get; }
 
@@ -70,7 +91,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             CheckDisposed();
 
-            if (_attachToExistingQueue)
+            if (!Created)
             {
                 return;
             }
@@ -92,7 +113,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             CheckDisposed();
 
-            if (_attachToExistingQueue)
+            if (!Created)
             {
                 return;
             }
