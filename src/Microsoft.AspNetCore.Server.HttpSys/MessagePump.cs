@@ -232,11 +232,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     if (Interlocked.Decrement(ref _outstandingRequests) == 0 && Stopping)
                     {
                         LogHelper.LogInfo(_logger, "All requests drained.");
-
-                        if (Interlocked.Exchange(ref _shutdownSignalCompleted, 1) == 0)
-                        {
-                            _shutdownSignal.TrySetResult(0);
-                        }
+                        _shutdownSignal.TrySetResult(0);
                     }
                 }
             }
@@ -270,7 +266,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             if (Interlocked.Exchange(ref _stopping, 1) == 1)
             {
-                RegisterCancelation();
+                if (_outstandingRequests > 0)
+                {
+                    RegisterCancelation();
+                }
+
                 return _shutdownSignal.Task;
             }
 
@@ -284,18 +284,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 }
                 else
                 {
-                    if (Interlocked.Exchange(ref _shutdownSignalCompleted, 1) == 0)
-                    {
-                        _shutdownSignal.TrySetResult(null);
-                    }
+                    _shutdownSignal.TrySetResult(null);
                 }
             }
             catch (Exception ex)
             {
-                if (Interlocked.Exchange(ref _shutdownSignalCompleted, 1) == 0)
-                {
-                    _shutdownSignal.TrySetException(ex);
-                }
+                _shutdownSignal.TrySetException(ex);
             }
 
             return _shutdownSignal.Task;
