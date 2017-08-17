@@ -11,7 +11,7 @@
     <ProjectReference Include="..\..\src\Microsoft.AspNetCore.Server.HttpSys\Microsoft.AspNetCore.Server.HttpSys.csproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
     <PackageReference Include="xunit" Version="$(XunitVersion)" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitVersion)" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualStudioVersion)" />
   </ItemGroup>
 
 </Project>
