@@ -25,7 +25,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private int _acceptorCounts;
         private Action<object> _processRequest;
 
-        private int _stopping;
+        private volatile int _stopping;
         private int _outstandingRequests;
         private readonly TaskCompletionSource<object> _shutdownSignal = new TaskCompletionSource<object>();
         private int _shutdownSignalCompleted;
@@ -266,10 +266,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             if (Interlocked.Exchange(ref _stopping, 1) == 1)
             {
-                if (_outstandingRequests > 0)
-                {
-                    RegisterCancelation();
-                }
+                RegisterCancelation();
 
                 return _shutdownSignal.Task;
             }
@@ -297,9 +294,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         public void Dispose()
         {
-            var cancelledTokenSource = new CancellationTokenSource();
-            cancelledTokenSource.Cancel();
-            StopAsync(cancelledTokenSource.Token).GetAwaiter().GetResult();
+            _stopping = 1;
+            _shutdownSignal.TrySetResult(null);
 
             Listener.Dispose();
         }

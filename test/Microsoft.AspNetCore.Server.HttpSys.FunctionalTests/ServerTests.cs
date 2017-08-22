@@ -557,6 +557,36 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         }
 
         [ConditionalFact]
+        public async Task Server_DisposeContinuesPendingStopAsyncCalls()
+        {
+            Task<string> responseTask;
+            ManualResetEvent received = new ManualResetEvent(false);
+            ManualResetEvent run = new ManualResetEvent(false);
+            string address;
+            Task stopTask1;
+            Task stopTask2;
+            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+                {
+                    received.Set();
+                    Assert.True(run.WaitOne(TimeSpan.FromSeconds(10)));
+                    httpContext.Response.ContentLength = 11;
+                    return httpContext.Response.WriteAsync("Hello World");
+                }))
+            {
+                responseTask = SendRequestAsync(address);
+                Assert.True(received.WaitOne(TimeSpan.FromSeconds(10)));
+
+                stopTask1 = server.StopAsync(new CancellationTokenSource().Token);
+                stopTask2 = server.StopAsync(new CancellationTokenSource().Token);
+
+                Assert.False(stopTask1.IsCompleted);
+                Assert.False(stopTask2.IsCompleted);
+            }
+
+            await Task.WhenAll(stopTask1, stopTask2).TimeoutAfter(TimeSpan.FromSeconds(10));
+        }
+
+        [ConditionalFact]
         public async Task Server_StopAsyncCalledWithNoRequests_Success()
         {
             using (var server = Utilities.CreateHttpServer(out _, httpContext => Task.CompletedTask))
