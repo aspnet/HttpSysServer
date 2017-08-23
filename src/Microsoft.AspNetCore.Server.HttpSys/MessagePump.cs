@@ -27,7 +27,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private volatile int _stopping;
         private int _outstandingRequests;
-        private readonly TaskCompletionSource<object> _shutdownSignal = new TaskCompletionSource<object>();
+        private readonly TaskCompletionSource<object> _shutdownSignal = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
         private int _shutdownSignalCompleted;
 
         private readonly ServerAddressesFeature _serverAddresses;
