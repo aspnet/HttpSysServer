@@ -2,7 +2,7 @@
   "testRunner": "xunit",
   "dependencies": {
     "dotnet-test-xunit": "1.0.0-rc3-000000-01",
-    "Microsoft.Net.Http.Server": "1.0.3",
+    "Microsoft.Net.Http.Server": "1.0.4",
     "xunit": "2.1.0"
   },
   "frameworks": {
