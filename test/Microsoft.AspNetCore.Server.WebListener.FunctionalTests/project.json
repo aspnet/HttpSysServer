@@ -14,10 +14,10 @@
     "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.0.6-servicing-004974-00",
+          "version": "1.0.6",
           "type": "platform"
         },
-        "System.Net.Http.WinHttpHandler": "4.0.3-servicing-25629-01",
+        "System.Net.Http.WinHttpHandler": "4.0.3",
         "System.Net.Requests": "4.0.11-*",
         "System.Net.WebHeaderCollection": "4.0.1-*",
         "System.Net.WebSockets.Client": "4.0.1"
