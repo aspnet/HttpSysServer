@@ -3,7 +3,7 @@
 
 using System.Text;
 
-namespace Microsoft.AspNetCore.Server.HttpSys
+namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     internal static class HeaderEncoding
     {

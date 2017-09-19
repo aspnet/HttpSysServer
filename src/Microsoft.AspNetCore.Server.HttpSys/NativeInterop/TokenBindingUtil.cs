@@ -3,7 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
-using static Microsoft.AspNetCore.Server.HttpSys.HttpApi;
+using static Microsoft.AspNetCore.HttpSys.Internal.HttpApi;
 using static Microsoft.AspNetCore.Server.HttpSys.UnsafeNclNativeMethods.TokenBinding;
 
 namespace Microsoft.AspNetCore.Server.HttpSys

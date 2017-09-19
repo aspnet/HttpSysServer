@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading;
+using Microsoft.AspNetCore.HttpSys.Internal;
 using Microsoft.Win32.SafeHandles;
 
 namespace Microsoft.AspNetCore.Server.HttpSys

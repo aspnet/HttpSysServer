@@ -6,10 +6,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Primitives;
 
-namespace Microsoft.AspNetCore.Server.HttpSys
-{
+namespace Microsoft.AspNetCore.HttpSys.Internal{
     internal partial class RequestHeaders : IDictionary<string, StringValues>
     {
         private IDictionary<string, StringValues> _extra;

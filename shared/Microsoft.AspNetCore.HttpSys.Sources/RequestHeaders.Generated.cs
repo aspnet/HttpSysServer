@@ -9,9 +9,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Primitives;
 
-namespace Microsoft.AspNetCore.Server.HttpSys
+namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     [GeneratedCode("TextTemplatingFileGenerator", "")]
     internal partial class RequestHeaders

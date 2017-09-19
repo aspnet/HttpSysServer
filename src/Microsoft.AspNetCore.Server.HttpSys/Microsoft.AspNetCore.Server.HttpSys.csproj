@@ -17,12 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\shared\Microsoft.AspNetCore.Server.HttpSys\RequestHeaders.Generated.tt" Link="RequestProcessing\RequestHeaders.Generated.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Core" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" />
     <PackageReference Include="Microsoft.Net.Http.Headers" />
