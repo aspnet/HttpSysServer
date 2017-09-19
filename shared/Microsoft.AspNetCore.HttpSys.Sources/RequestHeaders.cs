@@ -9,7 +9,8 @@ using System.Threading;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Primitives;
 
-namespace Microsoft.AspNetCore.HttpSys.Internal{
+namespace Microsoft.AspNetCore.HttpSys.Internal
+{
     internal partial class RequestHeaders : IDictionary<string, StringValues>
     {
         private IDictionary<string, StringValues> _extra;
