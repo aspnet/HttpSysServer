@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.HttpSys.Internal;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -70,6 +71,59 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [DllImport(HTTPAPI, ExactSpelling = true, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         internal static extern unsafe uint HttpCloseRequestQueue(IntPtr pReqQueueHandle);
 
+        internal static AuthenticationSchemes GetAuthTypeFromRequest(HttpApiTypes.HTTP_REQUEST_AUTH_TYPE input)
+        {
+            switch (input)
+            {
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeBasic:
+                    return AuthenticationSchemes.Basic;
+                // case HttpApi.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeDigest:
+                //  return AuthenticationSchemes.Digest;
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNTLM:
+                    return AuthenticationSchemes.NTLM;
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNegotiate:
+                    return AuthenticationSchemes.Negotiate;
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeKerberos:
+                    return AuthenticationSchemes.Kerberos;
+                default:
+                    throw new NotImplementedException(input.ToString());
+            }
+        }
+        private static HTTPAPI_VERSION version;
+
+        // This property is used by HttpListener to pass the version structure to the native layer in API
+        // calls. 
+
+        internal static HTTPAPI_VERSION Version
+        {
+            get
+            {
+                return version;
+            }
+        }
+
+        // This property is used by HttpListener to get the Api version in use so that it uses appropriate 
+        // Http APIs.
+
+        internal static HTTP_API_VERSION ApiVersion
+        {
+            get
+            {
+                if (version.HttpApiMajorVersion == 2 && version.HttpApiMinorVersion == 0)
+                {
+                    return HTTP_API_VERSION.Version20;
+                }
+                else if (version.HttpApiMajorVersion == 1 && version.HttpApiMinorVersion == 0)
+                {
+                    return HTTP_API_VERSION.Version10;
+                }
+                else
+                {
+                    return HTTP_API_VERSION.Invalid;
+                }
+            }
+        }
+
         static HttpApi()
         {
             InitHttpApi(2, 0);
@@ -93,5 +147,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 return supported;
             }
         }
+
     }
 }

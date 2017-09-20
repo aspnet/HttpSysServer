@@ -148,7 +148,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 statusCode = HttpApi.HttpReceiveHttpRequest(
                     Server.RequestQueue.Handle,
                     _nativeRequestContext.RequestId,
-                    (uint)HttpApi.HTTP_FLAGS.HTTP_RECEIVE_REQUEST_FLAG_COPY_BODY,
+                    (uint)HttpApiTypes.HTTP_FLAGS.HTTP_RECEIVE_REQUEST_FLAG_COPY_BODY,
                     _nativeRequestContext.NativeRequest,
                     _nativeRequestContext.Size,
                     &bytesTransferred,

@@ -9,7 +9,7 @@ using System.Security.Principal;
 using Microsoft.AspNetCore.HttpSys.Internal;
 using Microsoft.Extensions.Primitives;
 
-namespace Microsoft.AspNetCore.Server.HttpSys
+namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     internal unsafe class NativeRequestContext : IDisposable
     {
@@ -27,6 +27,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             _acceptResult = result;
             AllocateNativeRequest();
         }
+
+        internal NativeRequestContext(HttpApiTypes.HTTP_REQUEST* request)
+        {
+            _nativeRequest = request;
+        }
+
 
         internal SafeNativeOverlapped NativeOverlapped => _nativeOverlapped;
 
@@ -226,7 +232,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 {
                     // Duplicates AccessToken
                     var identity = new WindowsIdentity(info->pInfo->AccessToken,
-                        GetAuthTypeFromRequest(info->pInfo->AuthType).ToString());
+                        HttpApiTypes.GetAuthTypeFromRequest(info->pInfo->AuthType).ToString());
 
                     // Close the original
                     UnsafeNclNativeMethods.SafeNetHandles.CloseHandle(info->pInfo->AccessToken);
@@ -236,25 +242,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
 
             return new WindowsPrincipal(WindowsIdentity.GetAnonymous()); // Anonymous / !IsAuthenticated
-        }
-
-        private static AuthenticationSchemes GetAuthTypeFromRequest(HttpApiTypes.HTTP_REQUEST_AUTH_TYPE input)
-        {
-            switch (input)
-            {
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeBasic:
-                    return AuthenticationSchemes.Basic;
-                // case HttpApi.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeDigest:
-                //  return AuthenticationSchemes.Digest;
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNTLM:
-                    return AuthenticationSchemes.NTLM;
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNegotiate:
-                    return AuthenticationSchemes.Negotiate;
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeKerberos:
-                    return AuthenticationSchemes.Kerberos;
-                default:
-                    throw new NotImplementedException(input.ToString());
-            }
         }
 
         // These methods are for accessing the request structure after it has been unpinned. They need to adjust addresses

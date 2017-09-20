@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Server.HttpSys;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -690,62 +691,22 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
-        private static HTTPAPI_VERSION version;
-
-        // This property is used by HttpListener to pass the version structure to the native layer in API
-        // calls. 
-
-        internal static HTTPAPI_VERSION Version
+        internal static string GetAuthTypeFromRequest(HttpApiTypes.HTTP_REQUEST_AUTH_TYPE input)
         {
-            get
+            switch (input)
             {
-                return version;
-            }
-        }
-
-        // This property is used by HttpListener to get the Api version in use so that it uses appropriate 
-        // Http APIs.
-
-        internal static HTTP_API_VERSION ApiVersion
-        {
-            get
-            {
-                if (version.HttpApiMajorVersion == 2 && version.HttpApiMinorVersion == 0)
-                {
-                    return HTTP_API_VERSION.Version20;
-                }
-                else if (version.HttpApiMajorVersion == 1 && version.HttpApiMinorVersion == 0)
-                {
-                    return HTTP_API_VERSION.Version10;
-                }
-                else
-                {
-                    return HTTP_API_VERSION.Invalid;
-                }
-            }
-        }
-
-        static HttpApiTypes()
-        {
-            InitHttpApiTypes(2, 0);
-        }
-
-        private static void InitHttpApiTypes(ushort majorVersion, ushort minorVersion)
-        {
-            version.HttpApiMajorVersion = majorVersion;
-            version.HttpApiMinorVersion = minorVersion;
-
-            var statusCode = HttpInitialize(version, (uint)HTTP_FLAGS.HTTP_INITIALIZE_SERVER, null);
-
-            supported = statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS;
-        }
-
-        private static volatile bool supported;
-        internal static bool Supported
-        {
-            get
-            {
-                return supported;
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeBasic:
+                    return AuthenticationSchemes.Basic.ToString();
+                // case HttpApi.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeDigest:
+                //  return AuthenticationSchemes.Digest;
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNTLM:
+                    return AuthenticationSchemes.NTLM.ToString();
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNegotiate:
+                    return AuthenticationSchemes.Negotiate.ToString();
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeKerberos:
+                    return AuthenticationSchemes.Kerberos.ToString();
+                default:
+                    throw new NotImplementedException(input.ToString());
             }
         }
     }

@@ -51,7 +51,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.AspNetCore.HttpSys.Sources", "Microsoft.AspNetCore.HttpSys.Sources", "{4AB1E069-2A8A-4D46-98AE-CC82E3497038}"
 	ProjectSection(SolutionItems) = preProject
 		shared\Microsoft.AspNetCore.HttpSys.Sources\HeaderEncoding.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\HeaderEncoding.cs
-		shared\Microsoft.AspNetCore.HttpSys.Sources\HttpApi.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\HttpApi.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestHeaders.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestHeaders.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestHeaders.Generated.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestHeaders.Generated.cs
 	EndProjectSection
