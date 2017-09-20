@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Server.HttpSys;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -691,7 +690,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
-        internal static string GetAuthTypeFromRequest(HttpApiTypes.HTTP_REQUEST_AUTH_TYPE input)
+        internal static string GetAuthTypeFromRequest(HTTP_REQUEST_AUTH_TYPE input)
         {
             switch (input)
             {
