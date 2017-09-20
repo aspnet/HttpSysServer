@@ -24,11 +24,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private const uint CertBoblSize = 1500;
         private static readonly IOCompletionCallback IOCallback = new IOCompletionCallback(WaitCallback);
         private static readonly int RequestChannelBindStatusSize =
-            Marshal.SizeOf<HttpNativeStructs.HTTP_REQUEST_CHANNEL_BIND_STATUS>();
+            Marshal.SizeOf<HttpApiTypes.HTTP_REQUEST_CHANNEL_BIND_STATUS>();
 
         private SafeNativeOverlapped _overlapped;
         private byte[] _backingBuffer;
-        private HttpNativeStructs.HTTP_SSL_CLIENT_CERT_INFO* _memoryBlob;
+        private HttpApiTypes.HTTP_SSL_CLIENT_CERT_INFO* _memoryBlob;
         private uint _size;
         private TaskCompletionSource<object> _tcs;
         private RequestContext _requestContext;
@@ -105,7 +105,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        private HttpNativeStructs.HTTP_SSL_CLIENT_CERT_INFO* RequestBlob
+        private HttpApiTypes.HTTP_SSL_CLIENT_CERT_INFO* RequestBlob
         {
             get
             {
@@ -135,7 +135,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             var boundHandle = RequestContext.Server.RequestQueue.BoundHandle;
             _overlapped = new SafeNativeOverlapped(boundHandle,
                 boundHandle.AllocateNativeOverlapped(IOCallback, this, _backingBuffer));
-            _memoryBlob = (HttpNativeStructs.HTTP_SSL_CLIENT_CERT_INFO*)Marshal.UnsafeAddrOfPinnedArrayElement(_backingBuffer, 0);
+            _memoryBlob = (HttpApiTypes.HTTP_SSL_CLIENT_CERT_INFO*)Marshal.UnsafeAddrOfPinnedArrayElement(_backingBuffer, 0);
         }
 
         // When you use netsh to configure HTTP.SYS with clientcertnegotiation = enable
@@ -169,7 +169,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     HttpApi.HttpReceiveClientCertificate(
                         RequestQueueHandle,
                         RequestContext.Request.UConnectionId,
-                        (uint)HttpNativeStructs.HTTP_FLAGS.NONE,
+                        (uint)HttpApiTypes.HTTP_FLAGS.NONE,
                         RequestBlob,
                         size,
                         &bytesReceived,
@@ -177,7 +177,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
                 if (statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_MORE_DATA)
                 {
-                    HttpNativeStructs.HTTP_SSL_CLIENT_CERT_INFO* pClientCertInfo = RequestBlob;
+                    HttpApiTypes.HTTP_SSL_CLIENT_CERT_INFO* pClientCertInfo = RequestBlob;
                     size = bytesReceived + pClientCertInfo->CertEncodedSize;
                     Reset(size);
                     retry = true;
@@ -240,7 +240,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     // return the size of the initial cert structure.  To get the full size,
                     // we need to add the certificate encoding size as well.
 
-                    HttpNativeStructs.HTTP_SSL_CLIENT_CERT_INFO* pClientCertInfo = asyncResult.RequestBlob;
+                    HttpApiTypes.HTTP_SSL_CLIENT_CERT_INFO* pClientCertInfo = asyncResult.RequestBlob;
                     asyncResult.Reset(numBytes + pClientCertInfo->CertEncodedSize);
 
                     uint bytesReceived = 0;
@@ -248,7 +248,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         HttpApi.HttpReceiveClientCertificate(
                             requestContext.Server.RequestQueue.Handle,
                             requestContext.Request.UConnectionId,
-                            (uint)HttpNativeStructs.HTTP_FLAGS.NONE,
+                            (uint)HttpApiTypes.HTTP_FLAGS.NONE,
                             asyncResult._memoryBlob,
                             asyncResult._size,
                             &bytesReceived,
@@ -272,7 +272,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 }
                 else
                 {
-                    HttpNativeStructs.HTTP_SSL_CLIENT_CERT_INFO* pClientCertInfo = asyncResult._memoryBlob;
+                    HttpApiTypes.HTTP_SSL_CLIENT_CERT_INFO* pClientCertInfo = asyncResult._memoryBlob;
                     if (pClientCertInfo == null)
                     {
                         asyncResult.Complete(0, null);
@@ -375,7 +375,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     statusCode = HttpApi.HttpReceiveClientCertificate(
                         requestQueue.Handle,
                         connectionId,
-                        (uint)HttpNativeStructs.HTTP_FLAGS.HTTP_RECEIVE_SECURE_CHANNEL_TOKEN,
+                        (uint)HttpApiTypes.HTTP_FLAGS.HTTP_RECEIVE_SECURE_CHANNEL_TOKEN,
                         blobPtr,
                         (uint)size,
                         &bytesReceived,
@@ -419,7 +419,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static int GetTokenOffsetFromBlob(IntPtr blob)
         {
             Debug.Assert(blob != IntPtr.Zero);
-            IntPtr tokenPointer = Marshal.ReadIntPtr(blob, (int)Marshal.OffsetOf<HttpNativeStructs.HTTP_REQUEST_CHANNEL_BIND_STATUS>("ChannelToken"));
+            IntPtr tokenPointer = Marshal.ReadIntPtr(blob, (int)Marshal.OffsetOf<HttpApiTypes.HTTP_REQUEST_CHANNEL_BIND_STATUS>("ChannelToken"));
             Debug.Assert(tokenPointer != IntPtr.Zero);
             return (int)IntPtrHelper.Subtract(tokenPointer, blob);
         }
@@ -427,7 +427,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static int GetTokenSizeFromBlob(IntPtr blob)
         {
             Debug.Assert(blob != IntPtr.Zero);
-            return Marshal.ReadInt32(blob, (int)Marshal.OffsetOf<HttpNativeStructs.HTTP_REQUEST_CHANNEL_BIND_STATUS>("ChannelTokenSize"));
+            return Marshal.ReadInt32(blob, (int)Marshal.OffsetOf<HttpApiTypes.HTTP_REQUEST_CHANNEL_BIND_STATUS>("ChannelTokenSize"));
         }
     }
 }

@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <Compile Include="..\..\shared\Microsoft.AspNetCore.HttpSys.Sources\HeaderEncoding.cs" Link="RequestProcessing\HeaderEncoding.cs" />
-    <Compile Include="..\..\shared\Microsoft.AspNetCore.HttpSys.Sources\HttpApi.cs" Link="NativeInterop\HttpApi.cs" />
+    <Compile Include="..\..\shared\Microsoft.AspNetCore.HttpSys.Sources\HttpApiTypes.cs" Link="NativeInterop\HttpApiTypes.cs" />
     <Compile Include="..\..\shared\Microsoft.AspNetCore.HttpSys.Sources\RequestHeaders.cs" Link="RequestProcessing\RequestHeaders.cs" />
     <Compile Include="..\..\shared\Microsoft.AspNetCore.HttpSys.Sources\RequestHeaders.Generated.cs" Link="RequestProcessing\RequestHeaders.Generated.cs" />
   </ItemGroup>

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using static Microsoft.AspNetCore.HttpSys.Internal.HttpNativeStructs;
+using static Microsoft.AspNetCore.HttpSys.Internal.HttpApiTypes;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
 {

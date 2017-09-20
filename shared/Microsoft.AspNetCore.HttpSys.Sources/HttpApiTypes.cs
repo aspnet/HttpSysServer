@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
 {
-    internal static unsafe class HttpNativeStructs
+    internal static unsafe class HttpApiTypes
     {
         internal enum HTTP_API_VERSION
         {
@@ -722,6 +722,30 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                 {
                     return HTTP_API_VERSION.Invalid;
                 }
+            }
+        }
+
+        static HttpApiTypes()
+        {
+            InitHttpApiTypes(2, 0);
+        }
+
+        private static void InitHttpApiTypes(ushort majorVersion, ushort minorVersion)
+        {
+            version.HttpApiMajorVersion = majorVersion;
+            version.HttpApiMinorVersion = minorVersion;
+
+            var statusCode = HttpInitialize(version, (uint)HTTP_FLAGS.HTTP_INITIALIZE_SERVER, null);
+
+            supported = statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS;
+        }
+
+        private static volatile bool supported;
+        internal static bool Supported
+        {
+            get
+            {
+                return supported;
             }
         }
     }
