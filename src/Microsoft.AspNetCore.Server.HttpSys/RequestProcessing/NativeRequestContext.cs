@@ -20,12 +20,12 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         private byte[] _backingBuffer;
         private int _bufferAlignment;
         private SafeNativeOverlapped _nativeOverlapped;
-        private AsyncAcceptContext _acceptResult;
+        //private AsyncAcceptContext _acceptResult;
 
+        //    _nativeReuqest = HttpApi.AllocateNativeRequest();
         internal NativeRequestContext(AsyncAcceptContext result)
         {
-            _acceptResult = result;
-            AllocateNativeRequest();
+            //_acceptResult = result;
         }
 
         internal NativeRequestContext(HttpApiTypes.HTTP_REQUEST* request)
@@ -68,6 +68,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         internal ushort UnknownHeaderCount => NativeRequest->Headers.UnknownHeaderCount;
 
+        // bring sslstatus over
         internal SslStatus SslStatus
         {
             get
@@ -107,16 +108,17 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             _backingBuffer = new byte[size + AlignmentPadding];
         }
 
-        private void AllocateNativeRequest(uint? size = null)
+        // Take this out to a static method that returns a native request context. 
+        private NativeRequestContext AllocateNativeRequest(AsyncAcceptContext acceptResult)
         {
             // We can't reuse overlapped objects
             _nativeOverlapped?.Dispose();
 
             uint newSize = size.HasValue ? size.Value : _backingBuffer == null ? DefaultBufferSize : Size;
             SetBuffer(checked((int)newSize));
-            var boundHandle = _acceptResult.Server.RequestQueue.BoundHandle;
+            var boundHandle = acceptResult.Server.RequestQueue.BoundHandle;
             _nativeOverlapped = new SafeNativeOverlapped(boundHandle,
-                boundHandle.AllocateNativeOverlapped(AsyncAcceptContext.IOCallback, _acceptResult, _backingBuffer));
+                boundHandle.AllocateNativeOverlapped(AsyncAcceptContext.IOCallback, acceptResult, _backingBuffer));
 
             var requestAddress = Marshal.UnsafeAddrOfPinnedArrayElement(_backingBuffer, 0);
 
@@ -132,6 +134,8 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             _bufferAlignment = 0;
 
             _nativeRequest = (HttpApiTypes.HTTP_REQUEST*)(requestAddress + _bufferAlignment);
+            // nativeRequest
+            return new NativeRequestContext(_nativeOverlapped, _bufferAlignment, _nativeRequest);
         }
 
         internal void Reset(ulong requestId = 0, uint? size = null)
@@ -180,6 +184,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             return null;
         }
 
+        // either put in internal or refactor (not a big deal)
         internal CookedUrl GetCookedUrl()
         {
             return new CookedUrl(NativeRequest->CookedUrl);
@@ -218,6 +223,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             return false;
         }
 
+        // move this method to request. See how IIS will give us the user.
         internal WindowsPrincipal GetUser()
         {
             var requestInfo = NativeRequestV2->pRequestInfo;
@@ -232,7 +238,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                 {
                     // Duplicates AccessToken
                     var identity = new WindowsIdentity(info->pInfo->AccessToken,
-                        HttpApiTypes.GetAuthTypeFromRequest(info->pInfo->AuthType).ToString());
+                        HttpApi.GetAuthTypeFromRequest(info->pInfo->AuthType).ToString());
 
                     // Close the original
                     UnsafeNclNativeMethods.SafeNetHandles.CloseHandle(info->pInfo->AccessToken);
@@ -307,6 +313,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
+        // Bring this out
         internal SocketAddress GetRemoteEndPoint()
         {
             return GetEndPoint(localEndpoint: false);
@@ -333,6 +340,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
+        // Eliminate AddressFamily (system.net and in netstandard 2.0)
         private static SocketAddress CopyOutAddress(IntPtr address)
         {
             ushort addressFamily = *((ushort*)address);

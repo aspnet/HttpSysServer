@@ -22,6 +22,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             _server = server;
             _tcs = new TaskCompletionSource<RequestContext>();
+            // call some allocatenativerequest
             _nativeRequestContext = new NativeRequestContext(this);
         }
 
@@ -85,6 +86,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                             if (stoleBlob)
                             {
                                 // The request has been handed to the user, which means this code can't reuse the blob.  Reset it here.
+                                // TODO call static method for allocatenativerequest
                                 asyncResult._nativeRequestContext = complete ? null : new NativeRequestContext(asyncResult);
                             }
                             else

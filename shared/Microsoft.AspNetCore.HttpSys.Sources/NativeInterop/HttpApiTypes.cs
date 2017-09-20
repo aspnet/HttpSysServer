@@ -689,24 +689,5 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                 HttpHeaderMaximum = 41
             }
         }
-
-        internal static string GetAuthTypeFromRequest(HTTP_REQUEST_AUTH_TYPE input)
-        {
-            switch (input)
-            {
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeBasic:
-                    return AuthenticationSchemes.Basic.ToString();
-                // case HttpApi.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeDigest:
-                //  return AuthenticationSchemes.Digest;
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNTLM:
-                    return AuthenticationSchemes.NTLM.ToString();
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNegotiate:
-                    return AuthenticationSchemes.Negotiate.ToString();
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeKerberos:
-                    return AuthenticationSchemes.Kerberos.ToString();
-                default:
-                    throw new NotImplementedException(input.ToString());
-            }
-        }
     }
 }
