@@ -17,7 +17,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private static readonly IOCompletionCallback IOCallback = new IOCompletionCallback(Callback);
 
         private SafeNativeOverlapped _overlapped;
-        private HttpApi.HTTP_DATA_CHUNK[] _dataChunks;
+        private HttpNativeStructs.HTTP_DATA_CHUNK[] _dataChunks;
         private FileStream _fileStream;
         private ResponseBody _responseStream;
         private TaskCompletionSource<object> _tcs;
@@ -54,7 +54,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 return;
             }
 
-            _dataChunks = new HttpApi.HTTP_DATA_CHUNK[1 + (chunked ? 2 : 0)];
+            _dataChunks = new HttpNativeStructs.HTTP_DATA_CHUNK[1 + (chunked ? 2 : 0)];
             objectsToPin = new object[_dataChunks.Length + 1];
             objectsToPin[0] = _dataChunks;
             var currentChunk = 0;
@@ -111,7 +111,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
             else
             {
-                _dataChunks = new HttpApi.HTTP_DATA_CHUNK[chunked ? 3 : 1];
+                _dataChunks = new HttpNativeStructs.HTTP_DATA_CHUNK[chunked ? 3 : 1];
 
                 object[] objectsToPin = new object[_dataChunks.Length];
                 objectsToPin[_dataChunks.Length - 1] = _dataChunks;
@@ -120,23 +120,23 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 if (chunked)
                 {
                     chunkHeaderBuffer = Helpers.GetChunkHeader(count);
-                    _dataChunks[0].DataChunkType = HttpApi.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
+                    _dataChunks[0].DataChunkType = HttpNativeStructs.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
                     _dataChunks[0].fromMemory.BufferLength = (uint)chunkHeaderBuffer.Count;
                     objectsToPin[0] = chunkHeaderBuffer.Array;
 
-                    _dataChunks[1].DataChunkType = HttpApi.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromFileHandle;
+                    _dataChunks[1].DataChunkType = HttpNativeStructs.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromFileHandle;
                     _dataChunks[1].fromFile.offset = (ulong)offset;
                     _dataChunks[1].fromFile.count = (ulong)count;
                     _dataChunks[1].fromFile.fileHandle = _fileStream.SafeFileHandle.DangerousGetHandle();
                     // Nothing to pin for the file handle.
 
-                    _dataChunks[2].DataChunkType = HttpApi.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
+                    _dataChunks[2].DataChunkType = HttpNativeStructs.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
                     _dataChunks[2].fromMemory.BufferLength = (uint)Helpers.CRLF.Length;
                     objectsToPin[1] = Helpers.CRLF;
                 }
                 else
                 {
-                    _dataChunks[0].DataChunkType = HttpApi.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromFileHandle;
+                    _dataChunks[0].DataChunkType = HttpNativeStructs.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromFileHandle;
                     _dataChunks[0].fromFile.offset = (ulong)offset;
                     _dataChunks[0].fromFile.count = (ulong)count;
                     _dataChunks[0].fromFile.fileHandle = _fileStream.SafeFileHandle.DangerousGetHandle();
@@ -155,11 +155,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        private static void SetDataChunk(HttpApi.HTTP_DATA_CHUNK[] chunks, ref int chunkIndex, object[] objectsToPin, ref int pinIndex, ArraySegment<byte> segment)
+        private static void SetDataChunk(HttpNativeStructs.HTTP_DATA_CHUNK[] chunks, ref int chunkIndex, object[] objectsToPin, ref int pinIndex, ArraySegment<byte> segment)
         {
             objectsToPin[pinIndex] = segment.Array;
             pinIndex++;
-            chunks[chunkIndex].DataChunkType = HttpApi.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
+            chunks[chunkIndex].DataChunkType = HttpNativeStructs.HTTP_DATA_CHUNK_TYPE.HttpDataChunkFromMemory;
             // The address is not set until after we pin it with Overlapped
             chunks[chunkIndex].fromMemory.BufferLength = (uint)segment.Count;
             chunkIndex++;
@@ -196,7 +196,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        internal HttpApi.HTTP_DATA_CHUNK* DataChunks
+        internal HttpNativeStructs.HTTP_DATA_CHUNK* DataChunks
         {
             get
             {
@@ -206,7 +206,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 }
                 else
                 {
-                    return (HttpApi.HTTP_DATA_CHUNK*)(Marshal.UnsafeAddrOfPinnedArrayElement(_dataChunks, 0));
+                    return (HttpNativeStructs.HTTP_DATA_CHUNK*)(Marshal.UnsafeAddrOfPinnedArrayElement(_dataChunks, 0));
                 }
             }
         }

@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             var originalPath = RequestUriBuilder.DecodeAndUnescapePath(rawUrlInBytes);
 
             // 'OPTIONS * HTTP/1.1'
-            if (KnownMethod == HttpApi.HTTP_VERB.HttpVerbOPTIONS && string.Equals(RawUrl, "*", StringComparison.Ordinal))
+            if (KnownMethod == HttpNativeStructs.HTTP_VERB.HttpVerbOPTIONS && string.Equals(RawUrl, "*", StringComparison.Ordinal))
             {
                 PathBase = string.Empty;
                 Path = string.Empty;
@@ -138,9 +138,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         public HeaderCollection Headers { get; }
 
-        internal HttpApi.HTTP_VERB KnownMethod { get; }
+        internal HttpNativeStructs.HTTP_VERB KnownMethod { get; }
 
-        internal bool IsHeadMethod => KnownMethod == HttpApi.HTTP_VERB.HttpVerbHEAD;
+        internal bool IsHeadMethod => KnownMethod == HttpNativeStructs.HTTP_VERB.HttpVerbHEAD;
 
         public string Method { get; }
 
