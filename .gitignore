@@ -29,3 +29,7 @@ project.lock.json
 .vscode/
 .build/
 .testPublish/
+
+korebuild-lock.txt
+*.g.targets
+
