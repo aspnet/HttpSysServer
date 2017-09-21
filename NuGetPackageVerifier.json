@@ -2,7 +2,7 @@
     "adx-nonshipping": {
         "rules": [],
         "packages": {
-          "Microsoft.AspNetCore.RangeHelper.Sources": {}
+          "Microsoft.AspNetCore.HttpSys.Internal": {}
         }
     },
     "Default": {
