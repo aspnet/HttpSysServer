@@ -148,5 +148,39 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
+        private const int DefaultBufferSize = 4096;
+        private const int AlignmentPadding = 8;
+
+        // Take this out to a static method that returns a native request context. 
+        // TODO move this to a better place
+        internal static NativeRequestInput AllocateNativeRequest(AsyncAcceptContext acceptResult, byte[] backingBuffer = null, uint ? size = null)
+        {
+            //Debug.Assert(size != 0, "unexpected size");
+
+            // We can't reuse overlapped objects
+            uint newSize = size.HasValue ? size.Value : backingBuffer == null ? DefaultBufferSize : (uint)backingBuffer.Length - AlignmentPadding;
+            backingBuffer = new byte[newSize + AlignmentPadding];
+
+            var boundHandle = acceptResult.Server.RequestQueue.BoundHandle;
+            var nativeOverlapped = new SafeNativeOverlapped(boundHandle,
+                boundHandle.AllocateNativeOverlapped(AsyncAcceptContext.IOCallback, acceptResult, backingBuffer));
+
+            var requestAddress = Marshal.UnsafeAddrOfPinnedArrayElement(backingBuffer, 0);
+
+            // TODO:
+            // Apparently the HttpReceiveHttpRequest memory alignment requirements for non - ARM processors
+            // are different than for ARM processors. We have seen 4 - byte - aligned buffers allocated on
+            // virtual x64/x86 machines which were accepted by HttpReceiveHttpRequest without errors. In
+            // these cases the buffer alignment may cause reading values at invalid offset. Setting buffer
+            // alignment to 0 for now.
+            // 
+            // _bufferAlignment = (int)(requestAddress.ToInt64() & 0x07);
+
+            var bufferAlignment = 0;
+
+            var nativeRequest = (HttpApiTypes.HTTP_REQUEST*)(requestAddress + bufferAlignment);
+            // nativeRequest
+            return new NativeRequestInput(nativeOverlapped, bufferAlignment, nativeRequest, backingBuffer);
+        }
     }
 }

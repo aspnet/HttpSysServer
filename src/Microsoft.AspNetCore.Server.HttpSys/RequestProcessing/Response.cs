@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpSys.Internal;
 using Microsoft.Extensions.Primitives;
-using static Microsoft.AspNetCore.Server.HttpSys.UnsafeNclNativeMethods;
+using static Microsoft.AspNetCore.HttpSys.Internal.UnsafeNclNativeMethods;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
 {

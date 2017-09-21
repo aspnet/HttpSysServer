@@ -8,24 +8,27 @@ using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Microsoft.AspNetCore.HttpSys.Internal;
 using Microsoft.Extensions.Primitives;
+using System.Net.Sockets;
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     internal unsafe class NativeRequestContext : IDisposable
     {
-        private const int DefaultBufferSize = 4096;
         private const int AlignmentPadding = 8;
         private HttpApiTypes.HTTP_REQUEST* _nativeRequest;
         private IntPtr _originalBufferAddress;
-        private byte[] _backingBuffer;
         private int _bufferAlignment;
         private SafeNativeOverlapped _nativeOverlapped;
-        //private AsyncAcceptContext _acceptResult;
+        private byte[] _backingBuffer;
 
         //    _nativeReuqest = HttpApi.AllocateNativeRequest();
-        internal NativeRequestContext(AsyncAcceptContext result)
+        internal NativeRequestContext(NativeRequestInput input)
         {
             //_acceptResult = result;
+            _nativeOverlapped = input.NativeOverlapped;
+            _bufferAlignment = input.BufferAlignment;
+            _nativeRequest = input.NativeRequest;
+            _backingBuffer = input.BackingBuffer;
         }
 
         internal NativeRequestContext(HttpApiTypes.HTTP_REQUEST* request)
@@ -45,7 +48,16 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
-        private HttpApiTypes.HTTP_REQUEST_V2* NativeRequestV2
+        internal byte[] BackingBuffer
+        {
+            get
+            {
+                return _backingBuffer;
+            }
+        }
+
+        // Making this internal
+        internal HttpApiTypes.HTTP_REQUEST_V2* NativeRequestV2
         {
             get
             {
@@ -108,40 +120,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             _backingBuffer = new byte[size + AlignmentPadding];
         }
 
-        // Take this out to a static method that returns a native request context. 
-        private NativeRequestContext AllocateNativeRequest(AsyncAcceptContext acceptResult)
-        {
-            // We can't reuse overlapped objects
-            _nativeOverlapped?.Dispose();
-
-            uint newSize = size.HasValue ? size.Value : _backingBuffer == null ? DefaultBufferSize : Size;
-            SetBuffer(checked((int)newSize));
-            var boundHandle = acceptResult.Server.RequestQueue.BoundHandle;
-            _nativeOverlapped = new SafeNativeOverlapped(boundHandle,
-                boundHandle.AllocateNativeOverlapped(AsyncAcceptContext.IOCallback, acceptResult, _backingBuffer));
-
-            var requestAddress = Marshal.UnsafeAddrOfPinnedArrayElement(_backingBuffer, 0);
-
-            // TODO:
-            // Apparently the HttpReceiveHttpRequest memory alignment requirements for non - ARM processors
-            // are different than for ARM processors. We have seen 4 - byte - aligned buffers allocated on
-            // virtual x64/x86 machines which were accepted by HttpReceiveHttpRequest without errors. In
-            // these cases the buffer alignment may cause reading values at invalid offset. Setting buffer
-            // alignment to 0 for now.
-            // 
-            // _bufferAlignment = (int)(requestAddress.ToInt64() & 0x07);
-
-            _bufferAlignment = 0;
-
-            _nativeRequest = (HttpApiTypes.HTTP_REQUEST*)(requestAddress + _bufferAlignment);
-            // nativeRequest
-            return new NativeRequestContext(_nativeOverlapped, _bufferAlignment, _nativeRequest);
-        }
-
-        internal void Reset(ulong requestId = 0, uint? size = null)
+        internal void Reset(NativeRequestInput input, ulong requestId = 0)
         {
             Debug.Assert(_nativeRequest != null || _backingBuffer == null, "RequestContextBase::Dispose()|SetNativeRequest() called after ReleasePins().");
-            AllocateNativeRequest(size);
+            _nativeOverlapped?.Dispose();
+            _nativeOverlapped = input.NativeOverlapped;
+            _bufferAlignment = input.BufferAlignment;
+            _nativeRequest = input.NativeRequest;
+            _backingBuffer = input.BackingBuffer;
             RequestId = requestId;
         }
 
@@ -221,33 +207,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                 }
             }
             return false;
-        }
-
-        // move this method to request. See how IIS will give us the user.
-        internal WindowsPrincipal GetUser()
-        {
-            var requestInfo = NativeRequestV2->pRequestInfo;
-            var infoCount = NativeRequestV2->RequestInfoCount;
-
-            for (int i = 0; i < infoCount; i++)
-            {
-                var info = &requestInfo[i];
-                if (info != null
-                    && info->InfoType == HttpApiTypes.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeAuth
-                    && info->pInfo->AuthStatus == HttpApiTypes.HTTP_AUTH_STATUS.HttpAuthStatusSuccess)
-                {
-                    // Duplicates AccessToken
-                    var identity = new WindowsIdentity(info->pInfo->AccessToken,
-                        HttpApi.GetAuthTypeFromRequest(info->pInfo->AuthType).ToString());
-
-                    // Close the original
-                    UnsafeNclNativeMethods.SafeNetHandles.CloseHandle(info->pInfo->AccessToken);
-
-                    return new WindowsPrincipal(identity);
-                }
-            }
-
-            return new WindowsPrincipal(WindowsIdentity.GetAnonymous()); // Anonymous / !IsAuthenticated
         }
 
         // These methods are for accessing the request structure after it has been unpinned. They need to adjust addresses

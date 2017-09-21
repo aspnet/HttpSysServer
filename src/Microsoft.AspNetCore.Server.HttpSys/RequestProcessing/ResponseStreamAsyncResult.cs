@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.HttpSys.Internal;
-using static Microsoft.AspNetCore.Server.HttpSys.UnsafeNclNativeMethods;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
 {

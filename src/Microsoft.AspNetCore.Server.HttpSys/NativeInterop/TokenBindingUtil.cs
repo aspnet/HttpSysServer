@@ -5,7 +5,7 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.HttpSys.Internal;
 using static Microsoft.AspNetCore.HttpSys.Internal.HttpApiTypes;
-using static Microsoft.AspNetCore.Server.HttpSys.UnsafeNclNativeMethods.TokenBinding;
+using static Microsoft.AspNetCore.HttpSys.Internal.UnsafeNclNativeMethods.TokenBinding;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
 {

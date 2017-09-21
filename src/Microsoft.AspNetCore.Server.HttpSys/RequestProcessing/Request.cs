@@ -4,12 +4,12 @@
 using System;
 using System.Globalization;
 using System.IO;
-using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.HttpSys.Internal;
+using System.Net;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
 {
@@ -27,8 +27,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private long? _contentLength;
         private RequestStream _nativeStream;
 
-        private SocketAddress _localEndPoint;
-        private SocketAddress _remoteEndPoint;
+        private AspNetCore.HttpSys.Internal.SocketAddress _localEndPoint;
+        private AspNetCore.HttpSys.Internal.SocketAddress _remoteEndPoint;
 
         private bool _isDisposed = false;
 
@@ -81,7 +81,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             Headers = new HeaderCollection(new RequestHeaders(_nativeRequestContext));
 
-            User = nativeRequestContext.GetUser();
+            // TODO this may fail, check if things go wrong.
+            User = GetUser();
 
             // GetTlsTokenBindingInfo(); TODO: https://github.com/aspnet/HttpSysServer/issues/231
 
@@ -190,7 +191,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        private SocketAddress RemoteEndPoint
+        private AspNetCore.HttpSys.Internal.SocketAddress RemoteEndPoint
         {
             get
             {
@@ -203,7 +204,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        private SocketAddress LocalEndPoint
+        private AspNetCore.HttpSys.Internal.SocketAddress LocalEndPoint
         {
             get
             {
@@ -339,6 +340,33 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 _nativeStream = new RequestStream(RequestContext);
             }
             _nativeStream.SwitchToOpaqueMode();
+        }
+
+        // move this method to request. See how IIS will give us the user.
+        internal unsafe WindowsPrincipal GetUser()
+        {
+            var requestInfo = _nativeRequestContext.NativeRequestV2->pRequestInfo;
+            var infoCount = _nativeRequestContext.NativeRequestV2->RequestInfoCount;
+
+            for (int i = 0; i < infoCount; i++)
+            {
+                var info = &requestInfo[i];
+                if (info != null
+                    && info->InfoType == HttpApiTypes.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeAuth
+                    && info->pInfo->AuthStatus == HttpApiTypes.HTTP_AUTH_STATUS.HttpAuthStatusSuccess)
+                {
+                    // Duplicates AccessToken
+                    var identity = new WindowsIdentity(info->pInfo->AccessToken,
+                        HttpApi.GetAuthTypeFromRequest(info->pInfo->AuthType).ToString());
+
+                    // Close the original
+                    UnsafeNclNativeMethods.SafeNetHandles.CloseHandle(info->pInfo->AccessToken);
+
+                    return new WindowsPrincipal(identity);
+                }
+            }
+
+            return new WindowsPrincipal(WindowsIdentity.GetAnonymous()); // Anonymous / !IsAuthenticated
         }
     }
 }

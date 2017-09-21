@@ -3,10 +3,11 @@
 
 using System;
 
-namespace Microsoft.AspNetCore.Server.HttpSys
+namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     internal static class Constants
     {
+        // TODO convert this to httpabstractions stuff
         internal const string HttpScheme = "http";
         internal const string HttpsScheme = "https";
         internal const string Chunked = "chunked";

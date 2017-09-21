@@ -57,7 +57,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 throw new PlatformNotSupportedException();
             }
 
-            Debug.Assert(HttpApi.ApiVersion == HttpApi.HTTP_API_VERSION.Version20, "Invalid Http api version");
+            Debug.Assert(HttpApi.ApiVersion == HttpApiTypes.HTTP_API_VERSION.Version20, "Invalid Http api version");
 
             Options = options;
 
@@ -318,8 +318,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private unsafe void SendError(ulong requestId, int httpStatusCode, IList<string> authChallenges)
         {
-            HttpApi.HTTP_RESPONSE_V2 httpResponse = new HttpApi.HTTP_RESPONSE_V2();
-            httpResponse.Response_V1.Version = new HttpApi.HTTP_VERSION();
+            HttpApiTypes.HTTP_RESPONSE_V2 httpResponse = new HttpApiTypes.HTTP_RESPONSE_V2();
+            httpResponse.Response_V1.Version = new HttpApiTypes.HTTP_VERSION();
             httpResponse.Response_V1.Version.MajorVersion = (ushort)1;
             httpResponse.Response_V1.Version.MinorVersion = (ushort)1;
 
@@ -332,25 +332,25 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 {
                     pinnedHeaders = new List<GCHandle>();
 
-                    HttpApi.HTTP_RESPONSE_INFO[] knownHeaderInfo = null;
-                    knownHeaderInfo = new HttpApi.HTTP_RESPONSE_INFO[1];
+                    HttpApiTypes.HTTP_RESPONSE_INFO[] knownHeaderInfo = null;
+                    knownHeaderInfo = new HttpApiTypes.HTTP_RESPONSE_INFO[1];
                     gcHandle = GCHandle.Alloc(knownHeaderInfo, GCHandleType.Pinned);
                     pinnedHeaders.Add(gcHandle);
-                    httpResponse.pResponseInfo = (HttpApi.HTTP_RESPONSE_INFO*)gcHandle.AddrOfPinnedObject();
+                    httpResponse.pResponseInfo = (HttpApiTypes.HTTP_RESPONSE_INFO*)gcHandle.AddrOfPinnedObject();
 
-                    knownHeaderInfo[httpResponse.ResponseInfoCount].Type = HttpApi.HTTP_RESPONSE_INFO_TYPE.HttpResponseInfoTypeMultipleKnownHeaders;
+                    knownHeaderInfo[httpResponse.ResponseInfoCount].Type = HttpApiTypes.HTTP_RESPONSE_INFO_TYPE.HttpResponseInfoTypeMultipleKnownHeaders;
                     knownHeaderInfo[httpResponse.ResponseInfoCount].Length =
-                        (uint)Marshal.SizeOf<HttpApi.HTTP_MULTIPLE_KNOWN_HEADERS>();
+                        (uint)Marshal.SizeOf<HttpApiTypes.HTTP_MULTIPLE_KNOWN_HEADERS>();
 
-                    HttpApi.HTTP_MULTIPLE_KNOWN_HEADERS header = new HttpApi.HTTP_MULTIPLE_KNOWN_HEADERS();
+                    HttpApiTypes.HTTP_MULTIPLE_KNOWN_HEADERS header = new HttpApiTypes.HTTP_MULTIPLE_KNOWN_HEADERS();
 
-                    header.HeaderId = HttpApi.HTTP_RESPONSE_HEADER_ID.Enum.HttpHeaderWwwAuthenticate;
-                    header.Flags = HttpApi.HTTP_RESPONSE_INFO_FLAGS.PreserveOrder; // The docs say this is for www-auth only.
+                    header.HeaderId = HttpApiTypes.HTTP_RESPONSE_HEADER_ID.Enum.HttpHeaderWwwAuthenticate;
+                    header.Flags = HttpApiTypes.HTTP_RESPONSE_INFO_FLAGS.PreserveOrder; // The docs say this is for www-auth only.
 
-                    HttpApi.HTTP_KNOWN_HEADER[] nativeHeaderValues = new HttpApi.HTTP_KNOWN_HEADER[authChallenges.Count];
+                    HttpApiTypes.HTTP_KNOWN_HEADER[] nativeHeaderValues = new HttpApiTypes.HTTP_KNOWN_HEADER[authChallenges.Count];
                     gcHandle = GCHandle.Alloc(nativeHeaderValues, GCHandleType.Pinned);
                     pinnedHeaders.Add(gcHandle);
-                    header.KnownHeaders = (HttpApi.HTTP_KNOWN_HEADER*)gcHandle.AddrOfPinnedObject();
+                    header.KnownHeaders = (HttpApiTypes.HTTP_KNOWN_HEADER*)gcHandle.AddrOfPinnedObject();
 
                     for (int headerValueIndex = 0; headerValueIndex < authChallenges.Count; headerValueIndex++)
                     {
@@ -367,7 +367,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     // This type is a struct, not an object, so pinning it causes a boxed copy to be created. We can't do that until after all the fields are set.
                     gcHandle = GCHandle.Alloc(header, GCHandleType.Pinned);
                     pinnedHeaders.Add(gcHandle);
-                    knownHeaderInfo[0].pInfo = (HttpApi.HTTP_MULTIPLE_KNOWN_HEADERS*)gcHandle.AddrOfPinnedObject();
+                    knownHeaderInfo[0].pInfo = (HttpApiTypes.HTTP_MULTIPLE_KNOWN_HEADERS*)gcHandle.AddrOfPinnedObject();
 
                     httpResponse.ResponseInfoCount = 1;
                 }

@@ -3,9 +3,8 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Microsoft.AspNetCore.HttpSys.Internal;
 
-namespace Microsoft.AspNetCore.Server.HttpSys
+namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     // Note this type should only be used while the request buffer remains pinned
     internal class CookedUrl
