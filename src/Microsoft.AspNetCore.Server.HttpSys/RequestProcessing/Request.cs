@@ -8,8 +8,8 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.HttpSys.Internal;
 using System.Net;
+using Microsoft.AspNetCore.HttpSys.Internal;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
 {
@@ -81,7 +81,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             Headers = new HeaderCollection(new RequestHeaders(_nativeRequestContext));
 
-            // TODO this may fail, check if things go wrong.
             User = GetUser();
 
             // GetTlsTokenBindingInfo(); TODO: https://github.com/aspnet/HttpSysServer/issues/231
@@ -342,7 +341,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             _nativeStream.SwitchToOpaqueMode();
         }
 
-        // move this method to request. See how IIS will give us the user.
         internal unsafe WindowsPrincipal GetUser()
         {
             var requestInfo = _nativeRequestContext.NativeRequestV2->pRequestInfo;
