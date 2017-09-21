@@ -11,12 +11,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 {
     internal unsafe class AsyncAcceptContext : IAsyncResult, IDisposable
     {
+        internal static readonly IOCompletionCallback IOCallback = new IOCompletionCallback(IOWaitCallback);
 
         private TaskCompletionSource<RequestContext> _tcs;
         private HttpSysListener _server;
         private NativeRequestContext _nativeRequestContext;
-
-        internal static readonly IOCompletionCallback IOCallback = new IOCompletionCallback(IOWaitCallback);
 
         internal AsyncAcceptContext(HttpSysListener server)
         {
@@ -86,9 +85,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                             if (stoleBlob)
                             {
                                 // The request has been handed to the user, which means this code can't reuse the blob.  Reset it here.
-                                // TODO call static method for allocatenativerequest with whatever parameters are necessary
-                                // don't pass this in
-                                // acceptResult.Server.RequestQueue.BoundHandle;
                                 asyncResult._nativeRequestContext = complete ? null : new NativeRequestContext(HttpApi.AllocateNativeRequest(asyncResult));
                             }
                             else
@@ -99,7 +95,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     }
                     else
                     {
-                        // backing buffer stuff
                         var input = HttpApi.AllocateNativeRequest(asyncResult, asyncResult._nativeRequestContext.BackingBuffer, numBytes);
                         asyncResult._nativeRequestContext.Reset(input, asyncResult._nativeRequestContext.RequestId);
                     }

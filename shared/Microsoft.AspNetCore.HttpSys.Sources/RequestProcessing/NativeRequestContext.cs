@@ -4,11 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security.Principal;
-using Microsoft.AspNetCore.HttpSys.Internal;
-using Microsoft.Extensions.Primitives;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
+using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
 {
@@ -16,21 +14,21 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
     {
         private const int AlignmentPadding = 8;
         private HttpApiTypes.HTTP_REQUEST* _nativeRequest;
+        private byte[] _backingBuffer;
         private IntPtr _originalBufferAddress;
         private int _bufferAlignment;
         private SafeNativeOverlapped _nativeOverlapped;
-        private byte[] _backingBuffer;
 
-        //    _nativeReuqest = HttpApi.AllocateNativeRequest();
+        // To be used by HttpSys
         internal NativeRequestContext(NativeRequestInput input)
         {
-            //_acceptResult = result;
             _nativeOverlapped = input.NativeOverlapped;
             _bufferAlignment = input.BufferAlignment;
             _nativeRequest = input.NativeRequest;
             _backingBuffer = input.BackingBuffer;
         }
 
+        // To be used by IIS Integration.
         internal NativeRequestContext(HttpApiTypes.HTTP_REQUEST* request)
         {
             _nativeRequest = request;
@@ -56,7 +54,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
-        // Making this internal
         internal HttpApiTypes.HTTP_REQUEST_V2* NativeRequestV2
         {
             get
@@ -80,7 +77,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         internal ushort UnknownHeaderCount => NativeRequest->Headers.UnknownHeaderCount;
 
-        // bring sslstatus over
         internal SslStatus SslStatus
         {
             get
@@ -272,7 +268,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
-        // Bring this out
         internal SocketAddress GetRemoteEndPoint()
         {
             return GetEndPoint(localEndpoint: false);
@@ -299,7 +294,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
         }
 
-        // Eliminate AddressFamily (system.net and in netstandard 2.0)
         private static SocketAddress CopyOutAddress(IntPtr address)
         {
             ushort addressFamily = *((ushort*)address);

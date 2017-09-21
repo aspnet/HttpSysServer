@@ -152,7 +152,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private const int AlignmentPadding = 8;
 
         // Take this out to a static method that returns a native request context. 
-        // TODO move this to a better place
         internal static NativeRequestInput AllocateNativeRequest(AsyncAcceptContext acceptResult, byte[] backingBuffer = null, uint ? size = null)
         {
             //Debug.Assert(size != 0, "unexpected size");
