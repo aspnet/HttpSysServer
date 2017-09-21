@@ -166,7 +166,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             return null;
         }
 
-        // either put in internal or refactor (not a big deal)
         internal CookedUrl GetCookedUrl()
         {
             return new CookedUrl(NativeRequest->CookedUrl);

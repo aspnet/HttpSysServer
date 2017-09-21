@@ -1,11 +1,11 @@
 // Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.HttpSys.Internal;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.HttpSys.Internal;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
 {
@@ -21,7 +21,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             _server = server;
             _tcs = new TaskCompletionSource<RequestContext>();
-            // call some allocatenativerequest
             _nativeRequestContext = new NativeRequestContext(HttpApi.AllocateNativeRequest(this));
         }
 
@@ -95,8 +94,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     }
                     else
                     {
-                        var input = HttpApi.AllocateNativeRequest(asyncResult, asyncResult._nativeRequestContext.BackingBuffer, numBytes);
-                        asyncResult._nativeRequestContext.Reset(input, asyncResult._nativeRequestContext.RequestId);
+                        var nativeRequestInput = HttpApi.AllocateNativeRequest(asyncResult, asyncResult._nativeRequestContext.BackingBuffer, numBytes);
+                        asyncResult._nativeRequestContext.Reset(nativeRequestInput, asyncResult._nativeRequestContext.RequestId);
                     }
 
                     // We need to issue a new request, either because auth failed, or because our buffer was too small the first time.

@@ -1,10 +1,9 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.HttpSys.Internal;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.HttpSys.Internal;
 using static Microsoft.AspNetCore.HttpSys.Internal.HttpApiTypes;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
@@ -89,6 +88,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     throw new NotImplementedException(input.ToString());
             }
         }
+
         private static HTTPAPI_VERSION version;
 
         // This property is used by HttpListener to pass the version structure to the native layer in API
