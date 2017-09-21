@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             _server = server;
             _tcs = new TaskCompletionSource<RequestContext>();
             // call some allocatenativerequest
-            _nativeRequestContext = new NativeRequestContext(HttpApi.AllocateNativeRequest(this, null));
+            _nativeRequestContext = new NativeRequestContext(HttpApi.AllocateNativeRequest(this));
         }
 
         internal Task<RequestContext> Task
@@ -174,7 +174,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     // the buffer was not big enough to fit the headers, we need
                     // to read the RequestId returned, allocate a new buffer of the required size
                     var input = HttpApi.AllocateNativeRequest(this, _nativeRequestContext.BackingBuffer, bytesTransferred);
-                    _nativeRequestContext.Reset(input, _nativeRequestContext.RequestId);
+                    _nativeRequestContext.Reset(input);
                     retry = true;
                 }
                 else if (statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS

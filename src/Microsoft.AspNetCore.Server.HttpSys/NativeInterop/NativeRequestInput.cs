@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.HttpSys.Internal;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
 {
@@ -11,7 +9,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         {
             NativeOverlapped = nativeOverlapped;
             BufferAlignment = bufferAlignment;
-            NativeRequest = NativeRequest;
+            NativeRequest = nativeRequest;
             BackingBuffer = backingBuffer;
         }
         internal SafeNativeOverlapped NativeOverlapped { get; set; }
