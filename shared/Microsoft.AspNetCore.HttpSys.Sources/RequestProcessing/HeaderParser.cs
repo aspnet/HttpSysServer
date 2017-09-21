@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Primitives;
 
-namespace Microsoft.AspNetCore.Server.HttpSys
+namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     internal static class HeaderParser
     {
