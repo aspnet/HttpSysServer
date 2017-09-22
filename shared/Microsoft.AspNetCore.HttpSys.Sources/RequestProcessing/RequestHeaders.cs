@@ -163,8 +163,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                 }
                 else
                 {
-                    ValidateHeaderCharacters(key);
-                    ValidateHeaderCharacters(value);
                     Extra[key] = value;
                 }
             }
@@ -215,28 +213,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             if (IsReadOnly)
             {
                 throw new InvalidOperationException("The response headers cannot be modified because the response has already started.");
-            }
-        }
-
-        public static void ValidateHeaderCharacters(StringValues headerValues)
-        {
-            foreach (var value in headerValues)
-            {
-                ValidateHeaderCharacters(value);
-            }
-        }
-
-        public static void ValidateHeaderCharacters(string headerCharacters)
-        {
-            if (headerCharacters != null)
-            {
-                foreach (var ch in headerCharacters)
-                {
-                    if (ch < 0x20)
-                    {
-                        throw new InvalidOperationException(string.Format("Invalid control character in header: 0x{0:X2}", (byte)ch));
-                    }
-                }
             }
         }
 
