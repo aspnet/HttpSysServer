@@ -68,12 +68,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     {
                         // at this point we have received an unmanaged HTTP_REQUEST and memoryBlob
                         // points to it we need to hook up our authentication handling code here.
-                        bool stoleBlob = false;
                         try
                         {
                             if (server.ValidateRequest(asyncResult._nativeRequestContext) && server.ValidateAuth(asyncResult._nativeRequestContext))
                             {
-                                stoleBlob = true;
                                 RequestContext requestContext = new RequestContext(server, asyncResult._nativeRequestContext);
                                 asyncResult.Tcs.TrySetResult(requestContext);
                                 complete = true;
@@ -81,16 +79,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         }
                         finally
                         {
-                            if (stoleBlob)
-                            {
                                 // The request has been handed to the user, which means this code can't reuse the blob.  Reset it here.
-                                asyncResult._nativeRequestContext = complete ? null : HttpApi.AllocateNativeRequest(asyncResult, size: asyncResult._nativeRequestContext.Size);
-                            }
-                            else
-                            {
-                                //  (uint)backingBuffer.Length - AlignmentPadding
-                                asyncResult._nativeRequestContext = HttpApi.AllocateNativeRequest(asyncResult, size: asyncResult._nativeRequestContext.Size);
-                            }
+                            asyncResult._nativeRequestContext = complete ? null : HttpApi.AllocateNativeRequest(asyncResult, size: asyncResult._nativeRequestContext.Size);
                         }
                     }
                     else
