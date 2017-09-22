@@ -109,13 +109,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             _nativeOverlapped?.Dispose();
         }
 
-        private void SetBuffer(int size)
-        {
-            Debug.Assert(size != 0, "unexpected size");
-
-            _backingBuffer = new byte[size + AlignmentPadding];
-        }
-
         internal void Reset(NativeRequestInput input, ulong requestId = 0)
         {
             Debug.Assert(_nativeRequest != null || _backingBuffer == null, "RequestContextBase::Dispose()|SetNativeRequest() called after ReleasePins().");

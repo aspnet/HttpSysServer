@@ -72,7 +72,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         internal struct HTTP_KNOWN_HEADER
         {
             internal ushort RawValueLength;
-            internal sbyte* pRawValue;
+            internal byte* pRawValue;
         }
 
         [StructLayout(LayoutKind.Explicit)]
@@ -203,8 +203,8 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         {
             internal ushort NameLength;
             internal ushort RawValueLength;
-            internal sbyte* pName;
-            internal sbyte* pRawValue;
+            internal byte* pName;
+            internal byte* pRawValue;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -214,8 +214,8 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             internal ushort ConnectionKeySize;
             internal uint ServerCertIssuerSize;
             internal uint ServerCertSubjectSize;
-            internal sbyte* pServerCertIssuer;
-            internal sbyte* pServerCertSubject;
+            internal byte* pServerCertIssuer;
+            internal byte* pServerCertSubject;
             internal HTTP_SSL_CLIENT_CERT_INFO* pClientCertInfo;
             internal uint SslClientCertNegotiated;
         }
@@ -381,7 +381,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             internal HTTP_VERSION Version;
             internal ushort StatusCode;
             internal ushort ReasonLength;
-            internal sbyte* pReason;
+            internal byte* pReason;
             internal HTTP_RESPONSE_HEADERS Headers;
             internal ushort EntityChunkCount;
             internal HTTP_DATA_CHUNK* pEntityChunks;
@@ -445,8 +445,8 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             internal HTTP_VERB Verb;
             internal ushort UnknownVerbLength;
             internal ushort RawUrlLength;
-            internal sbyte* pUnknownVerb;
-            internal sbyte* pRawUrl;
+            internal byte* pUnknownVerb;
+            internal byte* pRawUrl;
             internal HTTP_COOKED_URL CookedUrl;
             internal HTTP_TRANSPORT_ADDRESS Address;
             internal HTTP_REQUEST_HEADERS Headers;
