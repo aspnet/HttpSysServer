@@ -56,7 +56,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NativeInterop", "NativeInterop", "{94AD33C9-1BDD-4385-A850-4B24FD5D5012}"
 	ProjectSection(SolutionItems) = preProject
 		shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\CookedUrl.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\CookedUrl.cs
-		shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\DisconnectListener.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\DisconnectListener.cs
+		shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HeapAllocHandle.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HeapAllocHandle.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HttpApiTypes.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HttpApiTypes.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HttpSysRequestHeader.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HttpSysRequestHeader.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HttpSysResponseHeader.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\NativeInterop\HttpSysResponseHeader.cs
@@ -71,7 +71,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NativeInterop", "NativeInte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RequestProcessing", "RequestProcessing", "{AA8C91BD-D558-468B-9258-1E186884F78D}"
 	ProjectSection(SolutionItems) = preProject
+		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HeaderCollection.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HeaderCollection.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HeaderEncoding.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HeaderEncoding.cs
+		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HeaderParser.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HeaderParser.cs
+		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HttpKnownHeaderNames.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\HttpKnownHeaderNames.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\NativeRequestContext.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\NativeRequestContext.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\RequestHeaders.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\RequestHeaders.cs
 		shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\RequestHeaders.Generated.cs = shared\Microsoft.AspNetCore.HttpSys.Sources\RequestProcessing\RequestHeaders.Generated.cs
