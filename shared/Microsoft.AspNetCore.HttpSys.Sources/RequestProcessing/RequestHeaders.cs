@@ -46,8 +46,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             set
             {
                 ThrowIfReadOnly();
-                ValidateHeaderCharacters(key);
-                ValidateHeaderCharacters(value);
                 if (!PropertiesTrySetValue(key, value))
                 {
                     Extra[key] = value;
