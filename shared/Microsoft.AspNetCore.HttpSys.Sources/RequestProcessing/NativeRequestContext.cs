@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Security.Principal;
 using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
@@ -312,6 +313,52 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
 
             return null;
+        }
+
+
+        internal unsafe WindowsPrincipal GetUser()
+        {
+            var requestInfo = NativeRequestV2->pRequestInfo;
+            var infoCount = NativeRequestV2->RequestInfoCount;
+
+            for (int i = 0; i < infoCount; i++)
+            {
+                var info = &requestInfo[i];
+                if (info != null
+                    && info->InfoType == HttpApiTypes.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeAuth
+                    && info->pInfo->AuthStatus == HttpApiTypes.HTTP_AUTH_STATUS.HttpAuthStatusSuccess)
+                {
+                    // Duplicates AccessToken
+                    var identity = new WindowsIdentity(info->pInfo->AccessToken, GetAuthTypeFromRequest(info->pInfo->AuthType));
+
+                    // Close the original
+                    UnsafeNclNativeMethods.SafeNetHandles.CloseHandle(info->pInfo->AccessToken);
+
+                    return new WindowsPrincipal(identity);
+                }
+            }
+
+            return new WindowsPrincipal(WindowsIdentity.GetAnonymous()); // Anonymous / !IsAuthenticated
+        }
+
+
+        private static string GetAuthTypeFromRequest(HttpApiTypes.HTTP_REQUEST_AUTH_TYPE input)
+        {
+            switch (input)
+            {
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeBasic:
+                    return "Basic";
+                // case HttpApi.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeDigest:
+                //  return AuthenticationSchemes.Digest;
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNTLM:
+                    return "NTLM";
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNegotiate:
+                    return "Negotiate";
+                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeKerberos:
+                    return "Kerberos";
+                default:
+                    throw new NotImplementedException(input.ToString());
+            }
         }
 
         internal uint GetChunks(ref int dataChunkIndex, ref uint dataChunkOffset, byte[] buffer, int offset, int size)

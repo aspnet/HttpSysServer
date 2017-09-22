@@ -81,7 +81,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             Headers = new RequestHeaders(_nativeRequestContext);
 
-            User = GetUser();
+            User = _nativeRequestContext.GetUser();
 
             // GetTlsTokenBindingInfo(); TODO: https://github.com/aspnet/HttpSysServer/issues/231
 
@@ -339,32 +339,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 _nativeStream = new RequestStream(RequestContext);
             }
             _nativeStream.SwitchToOpaqueMode();
-        }
-
-        internal unsafe WindowsPrincipal GetUser()
-        {
-            var requestInfo = _nativeRequestContext.NativeRequestV2->pRequestInfo;
-            var infoCount = _nativeRequestContext.NativeRequestV2->RequestInfoCount;
-
-            for (int i = 0; i < infoCount; i++)
-            {
-                var info = &requestInfo[i];
-                if (info != null
-                    && info->InfoType == HttpApiTypes.HTTP_REQUEST_INFO_TYPE.HttpRequestInfoTypeAuth
-                    && info->pInfo->AuthStatus == HttpApiTypes.HTTP_AUTH_STATUS.HttpAuthStatusSuccess)
-                {
-                    // Duplicates AccessToken
-                    var identity = new WindowsIdentity(info->pInfo->AccessToken,
-                        HttpApi.GetAuthTypeFromRequest(info->pInfo->AuthType).ToString());
-
-                    // Close the original
-                    UnsafeNclNativeMethods.SafeNetHandles.CloseHandle(info->pInfo->AccessToken);
-
-                    return new WindowsPrincipal(identity);
-                }
-            }
-
-            return new WindowsPrincipal(WindowsIdentity.GetAnonymous()); // Anonymous / !IsAuthenticated
         }
     }
 }

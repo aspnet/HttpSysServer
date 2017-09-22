@@ -70,24 +70,6 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [DllImport(HTTPAPI, ExactSpelling = true, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         internal static extern unsafe uint HttpCloseRequestQueue(IntPtr pReqQueueHandle);
 
-        internal static AuthenticationSchemes GetAuthTypeFromRequest(HttpApiTypes.HTTP_REQUEST_AUTH_TYPE input)
-        {
-            switch (input)
-            {
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeBasic:
-                    return AuthenticationSchemes.Basic;
-                // case HttpApi.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeDigest:
-                //  return AuthenticationSchemes.Digest;
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNTLM:
-                    return AuthenticationSchemes.NTLM;
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeNegotiate:
-                    return AuthenticationSchemes.Negotiate;
-                case HttpApiTypes.HTTP_REQUEST_AUTH_TYPE.HttpRequestAuthTypeKerberos:
-                    return AuthenticationSchemes.Kerberos;
-                default:
-                    throw new NotImplementedException(input.ToString());
-            }
-        }
 
         private static HTTPAPI_VERSION version;
 
