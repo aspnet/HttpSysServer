@@ -20,12 +20,20 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         private SafeNativeOverlapped _nativeOverlapped;
 
         // To be used by HttpSys
-        internal NativeRequestContext(NativeRequestInput input)
+        internal NativeRequestContext(SafeNativeOverlapped nativeOverlapped,
+            int bufferAlignment,
+            HttpApiTypes.HTTP_REQUEST* nativeRequest,
+            byte[] backingBuffer,
+            ulong? requestId = null)
         {
-            _nativeOverlapped = input.NativeOverlapped;
-            _bufferAlignment = input.BufferAlignment;
-            _nativeRequest = input.NativeRequest;
-            _backingBuffer = input.BackingBuffer;
+            _nativeOverlapped = nativeOverlapped;
+            _bufferAlignment = bufferAlignment;
+            _nativeRequest = nativeRequest;
+            _backingBuffer = backingBuffer;
+            if (requestId != null)
+            {
+                RequestId = requestId.Value;
+            }
         }
 
         // To be used by IIS Integration.
@@ -107,17 +115,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         {
             Debug.Assert(_nativeRequest == null, "RequestContextBase::Dispose()|Dispose() called before ReleasePins().");
             _nativeOverlapped?.Dispose();
-        }
-
-        internal void Reset(NativeRequestInput input, ulong requestId = 0)
-        {
-            Debug.Assert(_nativeRequest != null || _backingBuffer == null, "RequestContextBase::Dispose()|SetNativeRequest() called after ReleasePins().");
-            _nativeOverlapped?.Dispose();
-            _nativeOverlapped = input.NativeOverlapped;
-            _bufferAlignment = input.BufferAlignment;
-            _nativeRequest = input.NativeRequest;
-            _backingBuffer = input.BackingBuffer;
-            RequestId = requestId;
         }
 
         // These methods require the HTTP_REQUEST to still be pinned in its original location.

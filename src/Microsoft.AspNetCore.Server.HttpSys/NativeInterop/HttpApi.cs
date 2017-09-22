@@ -152,13 +152,13 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private const int AlignmentPadding = 8;
 
         // Take this out to a static method that returns a native request context. 
-        internal static NativeRequestInput AllocateNativeRequest(AsyncAcceptContext acceptResult, byte[] backingBuffer = null, uint ? size = null)
+        internal static NativeRequestContext AllocateNativeRequest(AsyncAcceptContext acceptResult, uint ? size = null)
         {
             //Debug.Assert(size != 0, "unexpected size");
 
             // We can't reuse overlapped objects
-            uint newSize = size.HasValue ? size.Value : backingBuffer == null ? DefaultBufferSize : (uint)backingBuffer.Length - AlignmentPadding;
-            backingBuffer = new byte[newSize + AlignmentPadding];
+            uint newSize = size.HasValue ? size.Value : DefaultBufferSize;
+            var backingBuffer = new byte[newSize + AlignmentPadding];
 
             var boundHandle = acceptResult.Server.RequestQueue.BoundHandle;
             var nativeOverlapped = new SafeNativeOverlapped(boundHandle,
@@ -179,7 +179,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             var nativeRequest = (HttpApiTypes.HTTP_REQUEST*)(requestAddress + bufferAlignment);
             // nativeRequest
-            return new NativeRequestInput(nativeOverlapped, bufferAlignment, nativeRequest, backingBuffer);
+            return new NativeRequestContext(nativeOverlapped, bufferAlignment, nativeRequest, backingBuffer);
         }
     }
 }

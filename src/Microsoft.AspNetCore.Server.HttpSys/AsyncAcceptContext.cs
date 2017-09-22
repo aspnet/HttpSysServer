@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             _server = server;
             _tcs = new TaskCompletionSource<RequestContext>();
-            _nativeRequestContext = new NativeRequestContext(HttpApi.AllocateNativeRequest(this));
+            _nativeRequestContext = HttpApi.AllocateNativeRequest(this);
         }
 
         internal Task<RequestContext> Task
@@ -84,18 +84,19 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                             if (stoleBlob)
                             {
                                 // The request has been handed to the user, which means this code can't reuse the blob.  Reset it here.
-                                asyncResult._nativeRequestContext = complete ? null : new NativeRequestContext(HttpApi.AllocateNativeRequest(asyncResult));
+                                asyncResult._nativeRequestContext = complete ? null : HttpApi.AllocateNativeRequest(asyncResult, size: asyncResult._nativeRequestContext.Size);
                             }
                             else
                             {
-                                asyncResult._nativeRequestContext.Reset(HttpApi.AllocateNativeRequest(asyncResult));
+                                //  (uint)backingBuffer.Length - AlignmentPadding
+                                asyncResult._nativeRequestContext = HttpApi.AllocateNativeRequest(asyncResult, size: asyncResult._nativeRequestContext.Size);
                             }
                         }
                     }
                     else
                     {
-                        var nativeRequestInput = HttpApi.AllocateNativeRequest(asyncResult, asyncResult._nativeRequestContext.BackingBuffer, numBytes);
-                        asyncResult._nativeRequestContext.Reset(nativeRequestInput, asyncResult._nativeRequestContext.RequestId);
+                        //  (uint)backingBuffer.Length - AlignmentPadding
+                        asyncResult._nativeRequestContext = HttpApi.AllocateNativeRequest(asyncResult, numBytes);
                     }
 
                     // We need to issue a new request, either because auth failed, or because our buffer was too small the first time.
@@ -166,8 +167,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 {
                     // the buffer was not big enough to fit the headers, we need
                     // to read the RequestId returned, allocate a new buffer of the required size
-                    var input = HttpApi.AllocateNativeRequest(this, _nativeRequestContext.BackingBuffer, bytesTransferred);
-                    _nativeRequestContext.Reset(input);
+                    //  (uint)backingBuffer.Length - AlignmentPadding
+                    _nativeRequestContext = HttpApi.AllocateNativeRequest(this, bytesTransferred);
                     retry = true;
                 }
                 else if (statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS
