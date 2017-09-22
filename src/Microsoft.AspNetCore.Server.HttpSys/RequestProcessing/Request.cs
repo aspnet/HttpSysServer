@@ -79,7 +79,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             ProtocolVersion = _nativeRequestContext.GetVersion();
 
-            Headers = new HeaderCollection(new RequestHeaders(_nativeRequestContext));
+            Headers = new RequestHeaders(_nativeRequestContext);
 
             User = GetUser();
 
@@ -136,7 +136,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        public HeaderCollection Headers { get; }
+        public RequestHeaders Headers { get; }
 
         internal HttpApiTypes.HTTP_VERB KnownMethod { get; }
 

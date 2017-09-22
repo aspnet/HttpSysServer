@@ -298,7 +298,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 fixed (byte* pReasonPhrase = reasonPhraseBytes)
                 {
                     _nativeResponse.Response_V1.ReasonLength = (ushort)reasonPhraseBytes.Length;
-                    _nativeResponse.Response_V1.pReason = (sbyte*)pReasonPhrase;
+                    _nativeResponse.Response_V1.pReason = (byte*)pReasonPhrase;
                     fixed (HttpApiTypes.HTTP_RESPONSE_V2* pResponse = &_nativeResponse)
                     {
                         statusCode =
@@ -501,7 +501,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                                 unknownHeaders[_nativeResponse.Response_V1.Headers.UnknownHeaderCount].NameLength = (ushort)bytes.Length;
                                 gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
                                 pinnedHeaders.Add(gcHandle);
-                                unknownHeaders[_nativeResponse.Response_V1.Headers.UnknownHeaderCount].pName = (sbyte*)gcHandle.AddrOfPinnedObject();
+                                unknownHeaders[_nativeResponse.Response_V1.Headers.UnknownHeaderCount].pName = (byte*)gcHandle.AddrOfPinnedObject();
 
                                 // Add Value
                                 headerValue = headerValues[headerValueIndex] ?? string.Empty;
@@ -509,7 +509,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                                 unknownHeaders[_nativeResponse.Response_V1.Headers.UnknownHeaderCount].RawValueLength = (ushort)bytes.Length;
                                 gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
                                 pinnedHeaders.Add(gcHandle);
-                                unknownHeaders[_nativeResponse.Response_V1.Headers.UnknownHeaderCount].pRawValue = (sbyte*)gcHandle.AddrOfPinnedObject();
+                                unknownHeaders[_nativeResponse.Response_V1.Headers.UnknownHeaderCount].pRawValue = (byte*)gcHandle.AddrOfPinnedObject();
                                 _nativeResponse.Response_V1.Headers.UnknownHeaderCount++;
                             }
                         }
@@ -520,7 +520,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                             pKnownHeaders[lookup].RawValueLength = (ushort)bytes.Length;
                             gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
                             pinnedHeaders.Add(gcHandle);
-                            pKnownHeaders[lookup].pRawValue = (sbyte*)gcHandle.AddrOfPinnedObject();
+                            pKnownHeaders[lookup].pRawValue = (byte*)gcHandle.AddrOfPinnedObject();
                         }
                         else
                         {
@@ -553,7 +553,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                                 nativeHeaderValues[header.KnownHeaderCount].RawValueLength = (ushort)bytes.Length;
                                 gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
                                 pinnedHeaders.Add(gcHandle);
-                                nativeHeaderValues[header.KnownHeaderCount].pRawValue = (sbyte*)gcHandle.AddrOfPinnedObject();
+                                nativeHeaderValues[header.KnownHeaderCount].pRawValue = (byte*)gcHandle.AddrOfPinnedObject();
                                 header.KnownHeaderCount++;
                             }
 

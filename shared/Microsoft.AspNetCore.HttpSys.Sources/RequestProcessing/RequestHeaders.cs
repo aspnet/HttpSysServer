@@ -6,11 +6,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
 {
-    internal partial class RequestHeaders : IDictionary<string, StringValues>
+    internal partial class RequestHeaders : IHeaderDictionary
     {
         private IDictionary<string, StringValues> _extra;
         private NativeRequestContext _requestMemoryBlob;
@@ -19,6 +20,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         {
             _requestMemoryBlob = requestMemoryBlob;
         }
+        public bool IsReadOnly { get; internal set; }
 
         private IDictionary<string, StringValues> Extra
         {
@@ -43,6 +45,9 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
             set
             {
+                ThrowIfReadOnly();
+                ValidateHeaderCharacters(key);
+                ValidateHeaderCharacters(value);
                 if (!PropertiesTrySetValue(key, value))
                 {
                     Extra[key] = value;
@@ -131,6 +136,64 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             get { return false; }
         }
 
+        long? IHeaderDictionary.ContentLength
+        {
+            get
+            {
+                return StringValues.IsNullOrEmpty(ContentLength) ? (long?)null : long.Parse(ContentLength);
+            }
+            set
+            {
+                ContentLength = value.ToString();
+            }
+        }
+
+        public StringValues this[string key]
+        {
+            get
+            {
+                StringValues values;
+                return TryGetValue(key, out values) ? values : StringValues.Empty;
+            }
+            set
+            {
+                if (StringValues.IsNullOrEmpty(value))
+                {
+                    Remove(key);
+                }
+                else
+                {
+                    ValidateHeaderCharacters(key);
+                    ValidateHeaderCharacters(value);
+                    Extra[key] = value;
+                }
+            }
+        }
+
+        StringValues IHeaderDictionary.this[string key]
+        {
+            get
+            {
+                if (PropertiesTryGetValue(key, out var value))
+                {
+                    return value;
+                }
+
+                if (Extra.TryGetValue(key, out value))
+                {
+                    return value;
+                }
+                return StringValues.Empty;
+            }
+            set
+            {
+                if (!PropertiesTrySetValue(key, value))
+                {
+                    Extra[key] = value;
+                }
+            }
+        }
+
         bool ICollection<KeyValuePair<string, StringValues>>.Remove(KeyValuePair<string, StringValues> item)
         {
             return ((IDictionary<string, StringValues>)this).Contains(item) &&
@@ -145,6 +208,46 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IDictionary<string, StringValues>)this).GetEnumerator();
+        }
+
+        private void ThrowIfReadOnly()
+        {
+            if (IsReadOnly)
+            {
+                throw new InvalidOperationException("The response headers cannot be modified because the response has already started.");
+            }
+        }
+
+        public static void ValidateHeaderCharacters(StringValues headerValues)
+        {
+            foreach (var value in headerValues)
+            {
+                ValidateHeaderCharacters(value);
+            }
+        }
+
+        public static void ValidateHeaderCharacters(string headerCharacters)
+        {
+            if (headerCharacters != null)
+            {
+                foreach (var ch in headerCharacters)
+                {
+                    if (ch < 0x20)
+                    {
+                        throw new InvalidOperationException(string.Format("Invalid control character in header: 0x{0:X2}", (byte)ch));
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<string> GetValues(string key)
+        {
+            StringValues values;
+            if (TryGetValue(key, out values))
+            {
+                return HeaderParser.SplitValues(values);
+            }
+            return HeaderParser.Empty;
         }
     }
 }
