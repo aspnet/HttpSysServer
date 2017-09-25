@@ -107,7 +107,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             _nativeOverlapped = null;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Debug.Assert(_nativeRequest == null, "RequestContextBase::Dispose()|Dispose() called before ReleasePins().");
             _nativeOverlapped?.Dispose();
