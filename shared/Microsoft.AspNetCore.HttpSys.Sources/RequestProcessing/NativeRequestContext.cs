@@ -26,16 +26,13 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             int bufferAlignment,
             HttpApiTypes.HTTP_REQUEST* nativeRequest,
             byte[] backingBuffer,
-            ulong? requestId = null)
+            ulong requestId)
         {
             _nativeOverlapped = nativeOverlapped;
             _bufferAlignment = bufferAlignment;
             _nativeRequest = nativeRequest;
             _backingBuffer = backingBuffer;
-            if (requestId != null)
-            {
-                RequestId = requestId.Value;
-            }
+            RequestId = requestId;
         }
 
         // To be used by IIS Integration.
