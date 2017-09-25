@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         private byte[] _backingBuffer;
         private int _bufferAlignment;
         private SafeNativeOverlapped _nativeOverlapped;
-        private bool _perminatelyPinned;
+        private bool _permanentlyPinned;
 
         // To be used by HttpSys
         internal NativeRequestContext(SafeNativeOverlapped nativeOverlapped,
@@ -43,7 +43,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         {
             _nativeRequest = request;
             _bufferAlignment = 0;
-            _perminatelyPinned = true;
+            _permanentlyPinned = true;
         }
 
 
@@ -239,7 +239,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         internal string GetKnownHeader(HttpSysRequestHeader header)
         {
-            if (_perminatelyPinned)
+            if (_permanentlyPinned)
             {
                 return GetKnowHeaderHelper(header, 0, _nativeRequest);
             }
@@ -272,7 +272,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         internal void GetUnknownHeaders(IDictionary<string, StringValues> unknownHeaders)
         {
-            if (_perminatelyPinned)
+            if (_permanentlyPinned)
             {
                 GetUnknownHeadersHelper(unknownHeaders, 0, _nativeRequest);
             }
@@ -333,31 +333,32 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         private SocketAddress GetEndPoint(bool localEndpoint)
         {
-            if (_perminatelyPinned)
+            if (_permanentlyPinned)
             {
-                var source = localEndpoint ? (byte*)_nativeRequest->Address.pLocalAddress : (byte*)_nativeRequest->Address.pRemoteAddress;
-                if (source == null)
-                {
-                    return null;
-                }
-                return CopyOutAddress((IntPtr)source);
+                return GetEndPointHelper(localEndpoint, _nativeRequest, (byte *)0);
             }
             else
             {
                 fixed (byte* pMemoryBlob = _backingBuffer)
                 {
                     var request = (HttpApiTypes.HTTP_REQUEST*)(pMemoryBlob + _bufferAlignment);
-                    var source = localEndpoint ? (byte*)request->Address.pLocalAddress : (byte*)request->Address.pRemoteAddress;
-
-                    if (source == null)
-                    {
-                        return null;
-                    }
-                    var address = (IntPtr)(pMemoryBlob + _bufferAlignment - (byte*)_originalBufferAddress + source);
-                    return CopyOutAddress(address);
+                    return GetEndPointHelper(localEndpoint, request, pMemoryBlob);
                 }
             }
         }
+        private SocketAddress GetEndPointHelper(bool localEndpoint, HttpApiTypes.HTTP_REQUEST* request, byte* pMemoryBlob)
+        {
+            var source = GetEndpointAddress(localEndpoint, request);
+            if (source == null)
+            {
+                return null;
+            }
+            var address = (IntPtr)(pMemoryBlob + _bufferAlignment - (byte*)_originalBufferAddress + source);
+            return CopyOutAddress(address);
+
+        }
+        private byte* GetEndpointAddress(bool localEndpoint, HttpApiTypes.HTTP_REQUEST* request) =>
+            localEndpoint ? (byte*)request->Address.pLocalAddress : (byte*)request->Address.pRemoteAddress;
 
         private static SocketAddress CopyOutAddress(IntPtr address)
         {
@@ -393,7 +394,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         internal uint GetChunks(ref int dataChunkIndex, ref uint dataChunkOffset, byte[] buffer, int offset, int size)
         {
             // Return value.
-            if (_perminatelyPinned)
+            if (_permanentlyPinned)
             {
                 return GetChunksHelper(ref dataChunkIndex, ref dataChunkOffset, buffer, offset, size, 0, _nativeRequest);
             }

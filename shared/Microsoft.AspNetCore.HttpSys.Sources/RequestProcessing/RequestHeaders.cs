@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
 {
@@ -15,11 +16,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
     {
         private IDictionary<string, StringValues> _extra;
         private NativeRequestContext _requestMemoryBlob;
+        private long? _contentLength;
+        private StringValues _contentLengthText;
 
         internal RequestHeaders(NativeRequestContext requestMemoryBlob)
         {
             _requestMemoryBlob = requestMemoryBlob;
         }
+
         public bool IsReadOnly { get; internal set; }
 
         private IDictionary<string, StringValues> Extra
@@ -138,11 +142,45 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
         {
             get
             {
-                return StringValues.IsNullOrEmpty(ContentLength) ? (long?)null : long.Parse(ContentLength);
+                long value;
+                var rawValue = this[HttpKnownHeaderNames.ContentLength];
+
+                if (_contentLengthText.Equals(rawValue))
+                {
+                    return _contentLength;
+                }
+
+                if (rawValue.Count == 1 &&
+                    !string.IsNullOrWhiteSpace(rawValue[0]) &&
+                    HeaderUtilities.TryParseNonNegativeInt64(new StringSegment(rawValue[0]).Trim(), out value))
+                {
+                    _contentLengthText = rawValue;
+                    _contentLength = value;
+                    return value;
+                }
+
+                return null;
             }
             set
             {
-                ContentLength = value.ToString();
+                ThrowIfReadOnly();
+
+                if (value.HasValue)
+                {
+                    if (value.Value < 0)
+                    {
+                        throw new ArgumentOutOfRangeException("value", value.Value, "Cannot be negative.");
+                    }
+                    _contentLengthText = HeaderUtilities.FormatNonNegativeInt64(value.Value);
+                    this[HttpKnownHeaderNames.ContentLength] = _contentLengthText;
+                    _contentLength = value;
+                }
+                else
+                {
+                    Remove(HttpKnownHeaderNames.ContentLength);
+                    _contentLengthText = StringValues.Empty;
+                    _contentLength = null;
+                }
             }
         }
 
