@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             _server = server;
             _tcs = new TaskCompletionSource<RequestContext>();
-            _nativeRequestContext = AllocateNativeRequest(this);
+            AllocateNativeRequest();
         }
 
         internal Task<RequestContext> Task
@@ -82,14 +82,21 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                         }
                         finally
                         {
-                                // The request has been handed to the user, which means this code can't reuse the blob.  Reset it here.
-                            asyncResult._nativeRequestContext = complete ? null : AllocateNativeRequest(asyncResult, size: asyncResult._nativeRequestContext.Size);
+                            // The request has been handed to the user, which means this code can't reuse the blob.  Reset it here.
+                            if (complete)
+                            {
+                                asyncResult._nativeRequestContext = null;
+                            }
+                            else
+                            {
+                                asyncResult.AllocateNativeRequest(size: asyncResult._nativeRequestContext.Size);
+                            }
                         }
                     }
                     else
                     {
                         //  (uint)backingBuffer.Length - AlignmentPadding
-                        asyncResult._nativeRequestContext = AllocateNativeRequest(asyncResult, numBytes, asyncResult._nativeRequestContext.RequestId);
+                       asyncResult.AllocateNativeRequest(numBytes, asyncResult._nativeRequestContext.RequestId);
                     }
 
                     // We need to issue a new request, either because auth failed, or because our buffer was too small the first time.
@@ -161,7 +168,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     // the buffer was not big enough to fit the headers, we need
                     // to read the RequestId returned, allocate a new buffer of the required size
                     //  (uint)backingBuffer.Length - AlignmentPadding
-                    _nativeRequestContext = AllocateNativeRequest(this, bytesTransferred);
+                    AllocateNativeRequest(bytesTransferred);
                     retry = true;
                 }
                 else if (statusCode == UnsafeNclNativeMethods.ErrorCodes.ERROR_SUCCESS
@@ -175,8 +182,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             return statusCode;
         }
 
-        // Take this out to a static method that returns a native request context. 
-        internal static NativeRequestContext AllocateNativeRequest(AsyncAcceptContext acceptResult, uint? size = null, ulong requestId = 0)
+        internal void AllocateNativeRequest(uint? size = null, ulong requestId = 0)
         {
             //Debug.Assert(size != 0, "unexpected size");
 
@@ -184,9 +190,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             uint newSize = size.HasValue ? size.Value : DefaultBufferSize;
             var backingBuffer = new byte[newSize + AlignmentPadding];
 
-            var boundHandle = acceptResult.Server.RequestQueue.BoundHandle;
+            var boundHandle = Server.RequestQueue.BoundHandle;
             var nativeOverlapped = new SafeNativeOverlapped(boundHandle,
-                boundHandle.AllocateNativeOverlapped(IOCallback, acceptResult, backingBuffer));
+                boundHandle.AllocateNativeOverlapped(IOCallback, this, backingBuffer));
 
             var requestAddress = Marshal.UnsafeAddrOfPinnedArrayElement(backingBuffer, 0);
 
@@ -203,7 +209,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             var nativeRequest = (HttpApiTypes.HTTP_REQUEST*)(requestAddress + bufferAlignment);
             // nativeRequest
-            return new NativeRequestContext(nativeOverlapped, bufferAlignment, nativeRequest, backingBuffer, requestId);
+            _nativeRequestContext = new NativeRequestContext(nativeOverlapped, bufferAlignment, nativeRequest, backingBuffer, requestId);
         }
 
         public object AsyncState
