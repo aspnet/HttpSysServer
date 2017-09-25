@@ -346,6 +346,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                 }
             }
         }
+
         private SocketAddress GetEndPointHelper(bool localEndpoint, HttpApiTypes.HTTP_REQUEST* request, byte* pMemoryBlob)
         {
             var source = localEndpoint ? (byte*)request->Address.pLocalAddress : (byte*)request->Address.pRemoteAddress;
@@ -356,7 +357,6 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             }
             var address = (IntPtr)(pMemoryBlob + _bufferAlignment - (byte*)_originalBufferAddress + source);
             return CopyOutAddress(address);
-
         }
 
         private static SocketAddress CopyOutAddress(IntPtr address)
