@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "Microsoft.AspNetCore.Server.WebListener": "1.0.4",
+    "Microsoft.AspNetCore.Server.WebListener": "1.0.5",
     "Microsoft.Extensions.Logging.Console": "1.0.2"
   },
   "buildOptions": {
@@ -14,7 +14,7 @@
     "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.0.7",
+          "version": "1.0.8-servicing-005009-00",
           "type": "platform"
         }
       }
