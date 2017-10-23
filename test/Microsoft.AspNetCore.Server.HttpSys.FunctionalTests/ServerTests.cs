@@ -9,12 +9,9 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Testing;
 using Microsoft.AspNetCore.Testing.xunit;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Microsoft.AspNetCore.Server.HttpSys
@@ -24,11 +21,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public async Task Server_200OK_Success()
         {
-            string address;
-            using (Utilities.CreateHttpServer(out address, httpContext =>
-                {
-                    return Task.FromResult(0);
-                }))
+            using (Utilities.CreateHttpServer(out var address, httpContext =>
+            {
+                return Task.CompletedTask;
+            }))
             {
                 string response = await SendRequestAsync(address);
                 Assert.Equal(string.Empty, response);
@@ -38,12 +34,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public async Task Server_SendHelloWorld_Success()
         {
-            string address;
-            using (Utilities.CreateHttpServer(out address, httpContext =>
-                {
-                    httpContext.Response.ContentLength = 11;
-                    return httpContext.Response.WriteAsync("Hello World");
-                }))
+            using (Utilities.CreateHttpServer(out var address, httpContext =>
+            {
+                httpContext.Response.ContentLength = 11;
+                return httpContext.Response.WriteAsync("Hello World");
+            }))
             {
                 string response = await SendRequestAsync(address);
                 Assert.Equal("Hello World", response);
@@ -53,14 +48,13 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public async Task Server_EchoHelloWorld_Success()
         {
-            string address;
-            using (Utilities.CreateHttpServer(out address, async httpContext =>
-                {
-                    var input = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
-                    Assert.Equal("Hello World", input);
-                    httpContext.Response.ContentLength = 11;
-                    await httpContext.Response.WriteAsync("Hello World");
-                }))
+            using (Utilities.CreateHttpServer(out var address, async httpContext =>
+            {
+                var input = await new StreamReader(httpContext.Request.Body).ReadToEndAsync();
+                Assert.Equal("Hello World", input);
+                httpContext.Response.ContentLength = 11;
+                await httpContext.Response.WriteAsync("Hello World");
+            }))
             {
                 string response = await SendRequestAsync(address, "Hello World");
                 Assert.Equal("Hello World", response);
@@ -71,14 +65,13 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public async Task Server_ShutdownDuringRequest_Success()
         {
             Task<string> responseTask;
-            ManualResetEvent received = new ManualResetEvent(false);
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
-                {
-                    received.Set();
-                    httpContext.Response.ContentLength = 11;
-                    return httpContext.Response.WriteAsync("Hello World");
-                }))
+            var received = new ManualResetEvent(false);
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
+            {
+                received.Set();
+                httpContext.Response.ContentLength = 11;
+                return httpContext.Response.WriteAsync("Hello World");
+            }))
             {
                 responseTask = SendRequestAsync(address);
                 Assert.True(received.WaitOne(10000));
@@ -94,8 +87,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             Task<string> responseTask;
             var received = new ManualResetEvent(false);
             var stopped = new ManualResetEvent(false);
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
             {
                 received.Set();
                 Assert.True(stopped.WaitOne(TimeSpan.FromSeconds(10)));
@@ -117,8 +109,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             var received = new ManualResetEvent(false);
             bool? shutdown = null;
             var waitForShutdown = new ManualResetEvent(false);
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
             {
                 received.Set();
                 shutdown = waitForShutdown.WaitOne(TimeSpan.FromSeconds(15));
@@ -138,13 +129,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public async Task Server_AppException_ClientReset()
         {
-            string address;
-            using (Utilities.CreateHttpServer(out address, httpContext =>
+            using (Utilities.CreateHttpServer(out var address, httpContext =>
             {
                 throw new InvalidOperationException();
             }))
             {
-                Task<string> requestTask = SendRequestAsync(address);
+                var requestTask = SendRequestAsync(address);
                 await Assert.ThrowsAsync<HttpRequestException>(async () => await requestTask);
 
                 // Do it again to make sure the server didn't crash
@@ -153,15 +143,14 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
-        [ConditionalFact(Skip = "https://github.com/aspnet/HttpSysServer/issues/263")]
+        [ConditionalFact]
         public void Server_MultipleOutstandingSyncRequests_Success()
         {
-            int requestLimit = 10;
-            int requestCount = 0;
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var requestLimit = 10;
+            var requestCount = 0;
+            var tcs = new TaskCompletionSource<object>();
 
-            string address;
-            using (Utilities.CreateHttpServer(out address, httpContext =>
+            using (Utilities.CreateHttpServer(out var address, httpContext =>
             {
                 if (Interlocked.Increment(ref requestCount) == requestLimit)
                 {
@@ -172,14 +161,13 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     tcs.Task.Wait();
                 }
 
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }))
             {
-                List<Task> requestTasks = new List<Task>();
+                var requestTasks = new List<Task>();
                 for (int i = 0; i < requestLimit; i++)
                 {
-                    Task<string> requestTask = SendRequestAsync(address);
-                    requestTasks.Add(requestTask);
+                    requestTasks.Add(SendRequestAsync(address));
                 }
 
                 Assert.True(Task.WaitAll(requestTasks.ToArray(), TimeSpan.FromSeconds(60)), "Timed out");
@@ -189,12 +177,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public void Server_MultipleOutstandingAsyncRequests_Success()
         {
-            int requestLimit = 10;
-            int requestCount = 0;
-            TaskCompletionSource<object> tcs = new TaskCompletionSource<object>();
+            var requestLimit = 10;
+            var requestCount = 0;
+            var tcs = new TaskCompletionSource<object>();
 
-            string address;
-            using (Utilities.CreateHttpServer(out address, async httpContext =>
+            using (Utilities.CreateHttpServer(out var address, async httpContext =>
             {
                 if (Interlocked.Increment(ref requestCount) == requestLimit)
                 {
@@ -206,7 +193,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 }
             }))
             {
-                List<Task> requestTasks = new List<Task>();
+                var requestTasks = new List<Task>();
                 for (int i = 0; i < requestLimit; i++)
                 {
                     Task<string> requestTask = SendRequestAsync(address);
@@ -219,13 +206,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public async Task Server_ClientDisconnects_CallCanceled()
         {
-            TimeSpan interval = TimeSpan.FromSeconds(10);
-            ManualResetEvent received = new ManualResetEvent(false);
-            ManualResetEvent aborted = new ManualResetEvent(false);
-            ManualResetEvent canceled = new ManualResetEvent(false);
+            var interval = TimeSpan.FromSeconds(10);
+            var received = new ManualResetEvent(false);
+            var aborted = new ManualResetEvent(false);
+            var canceled = new ManualResetEvent(false);
 
-            string address;
-            using (Utilities.CreateHttpServer(out address, httpContext =>
+            using (Utilities.CreateHttpServer(out var address, httpContext =>
             {
                 CancellationToken ct = httpContext.RequestAborted;
                 Assert.True(ct.CanBeCanceled, "CanBeCanceled");
@@ -235,7 +221,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 Assert.True(aborted.WaitOne(interval), "Aborted");
                 Assert.True(ct.WaitHandle.WaitOne(interval), "CT Wait");
                 Assert.True(ct.IsCancellationRequested, "IsCancellationRequested");
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }))
             {
                 // Note: System.Net.Sockets does not RST the connection by default, it just FINs.
@@ -255,13 +241,12 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public async Task Server_Abort_CallCanceled()
         {
-            TimeSpan interval = TimeSpan.FromSeconds(100);
-            ManualResetEvent received = new ManualResetEvent(false);
-            ManualResetEvent aborted = new ManualResetEvent(false);
-            ManualResetEvent canceled = new ManualResetEvent(false);
+            var interval = TimeSpan.FromSeconds(100);
+            var received = new ManualResetEvent(false);
+            var aborted = new ManualResetEvent(false);
+            var canceled = new ManualResetEvent(false);
 
-            string address;
-            using (Utilities.CreateHttpServer(out address, httpContext =>
+            using (Utilities.CreateHttpServer(out var address, httpContext =>
             {
                 CancellationToken ct = httpContext.RequestAborted;
                 Assert.True(ct.CanBeCanceled, "CanBeCanceled");
@@ -271,7 +256,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 httpContext.Abort();
                 Assert.True(canceled.WaitOne(interval), "Aborted");
                 Assert.True(ct.IsCancellationRequested, "IsCancellationRequested");
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }))
             {
                 using (var client = await SendHungRequestAsync("GET", address))
@@ -287,7 +272,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             // This is just to get a dynamic port
             string address;
-            using (Utilities.CreateHttpServer(out address, httpContext => Task.FromResult(0))) { }
+            using (Utilities.CreateHttpServer(out address, httpContext => Task.CompletedTask)) { }
 
             var server = Utilities.CreatePump();
             server.Listener.Options.UrlPrefixes.Add(UrlPrefix.Create(address));
@@ -318,7 +303,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             // This is just to get a dynamic port
             string address;
-            using (Utilities.CreateHttpServer(out address, httpContext => Task.FromResult(0))) { }
+            using (Utilities.CreateHttpServer(out address, httpContext => Task.CompletedTask)) { }
 
             var server = Utilities.CreatePump();
             server.Listener.Options.UrlPrefixes.Add(UrlPrefix.Create(address));
@@ -350,7 +335,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             // This is just to get a dynamic port
             string address;
-            using (Utilities.CreateHttpServer(out address, httpContext => Task.FromResult(0))) { }
+            using (Utilities.CreateHttpServer(out address, httpContext => Task.CompletedTask)) { }
 
             var server = Utilities.CreatePump();
             server.Listener.Options.UrlPrefixes.Add(UrlPrefix.Create(address));
@@ -386,7 +371,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             // This is just to get a dynamic port
             string address;
-            using (Utilities.CreateHttpServer(out address, httpContext => Task.FromResult(0))) { }
+            using (Utilities.CreateHttpServer(out address, httpContext => Task.CompletedTask)) { }
 
             var server = Utilities.CreatePump();
             server.Listener.Options.UrlPrefixes.Add(UrlPrefix.Create(address));
@@ -411,10 +396,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public async Task Server_MultipleStopAsyncCallsWaitForRequestsToDrain_Success()
         {
             Task<string> responseTask;
-            ManualResetEvent received = new ManualResetEvent(false);
-            ManualResetEvent run = new ManualResetEvent(false);
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+            var received = new ManualResetEvent(false);
+            var run = new ManualResetEvent(false);
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
                 {
                     received.Set();
                     Assert.True(run.WaitOne(TimeSpan.FromSeconds(10)));
@@ -446,10 +430,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public async Task Server_MultipleStopAsyncCallsCompleteOnCancellation_SameToken_Success()
         {
             Task<string> responseTask;
-            ManualResetEvent received = new ManualResetEvent(false);
-            ManualResetEvent run = new ManualResetEvent(false);
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+            var received = new ManualResetEvent(false);
+            var run = new ManualResetEvent(false);
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
                 {
                     received.Set();
                     Assert.True(run.WaitOne(TimeSpan.FromSeconds(10)));
@@ -475,7 +458,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
                 run.Set();
 
-                string response = await responseTask;
+                var response = await responseTask;
                 Assert.Equal("Hello World", response);
             }
         }
@@ -484,10 +467,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public async Task Server_MultipleStopAsyncCallsCompleteOnSingleCancellation_FirstToken_Success()
         {
             Task<string> responseTask;
-            ManualResetEvent received = new ManualResetEvent(false);
-            ManualResetEvent run = new ManualResetEvent(false);
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+            var received = new ManualResetEvent(false);
+            var run = new ManualResetEvent(false);
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
                 {
                     received.Set();
                     Assert.True(run.WaitOne(TimeSpan.FromSeconds(10)));
@@ -513,7 +495,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
                 run.Set();
 
-                string response = await responseTask;
+                var response = await responseTask;
                 Assert.Equal("Hello World", response);
             }
         }
@@ -522,10 +504,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public async Task Server_MultipleStopAsyncCallsCompleteOnSingleCancellation_SubsequentToken_Success()
         {
             Task<string> responseTask;
-            ManualResetEvent received = new ManualResetEvent(false);
-            ManualResetEvent run = new ManualResetEvent(false);
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+            var received = new ManualResetEvent(false);
+            var run = new ManualResetEvent(false);
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
                 {
                     received.Set();
                     Assert.True(run.WaitOne(TimeSpan.FromSeconds(10)));
@@ -551,7 +532,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
                 run.Set();
 
-                string response = await responseTask;
+                var response = await responseTask;
                 Assert.Equal("Hello World", response);
             }
         }
@@ -560,12 +541,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         public async Task Server_DisposeContinuesPendingStopAsyncCalls()
         {
             Task<string> responseTask;
-            ManualResetEvent received = new ManualResetEvent(false);
-            ManualResetEvent run = new ManualResetEvent(false);
-            string address;
+            var received = new ManualResetEvent(false);
+            var run = new ManualResetEvent(false);
             Task stopTask1;
             Task stopTask2;
-            using (var server = Utilities.CreateHttpServer(out address, httpContext =>
+            using (var server = Utilities.CreateHttpServer(out var address, httpContext =>
                 {
                     received.Set();
                     Assert.True(run.WaitOne(TimeSpan.FromSeconds(10)));
@@ -591,13 +571,13 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         {
             using (var server = Utilities.CreateHttpServer(out _, httpContext => Task.CompletedTask))
             {
-                await server.StopAsync(default(CancellationToken)).TimeoutAfter(TimeSpan.FromSeconds(10));
+                await server.StopAsync(default).TimeoutAfter(TimeSpan.FromSeconds(10));
             }
         }
 
         private async Task<string> SendRequestAsync(string uri)
         {
-            using (HttpClient client = new HttpClient())
+            using (var client = new HttpClient())
             {
                 return await client.GetStringAsync(uri);
             }
@@ -605,9 +585,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private async Task<string> SendRequestAsync(string uri, string upload)
         {
-            using (HttpClient client = new HttpClient())
+            using (var client = new HttpClient())
             {
-                HttpResponseMessage response = await client.PostAsync(uri, new StringContent(upload));
+                var response = await client.PostAsync(uri, new StringContent(upload));
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
@@ -616,13 +596,13 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         private async Task<TcpClient> SendHungRequestAsync(string method, string address)
         {
             // Connect with a socket
-            Uri uri = new Uri(address);
-            TcpClient client = new TcpClient();
+            var uri = new Uri(address);
+            var client = new TcpClient();
 
             try
             {
                 await client.ConnectAsync(uri.Host, uri.Port);
-                NetworkStream stream = client.GetStream();
+                var stream = client.GetStream();
 
                 // Send an HTTP GET request
                 byte[] requestBytes = BuildGetRequest(method, uri);
@@ -639,7 +619,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         private byte[] BuildGetRequest(string method, Uri uri)
         {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             builder.Append(method);
             builder.Append(" ");
             builder.Append(uri.PathAndQuery);
