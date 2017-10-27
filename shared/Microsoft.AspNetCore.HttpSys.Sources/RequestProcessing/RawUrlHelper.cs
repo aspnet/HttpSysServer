@@ -7,6 +7,8 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     internal static class RawUrlHelper
     {
+        private static byte[] _emtpyByteArray = new byte[0];
+
         /// <summary>
         /// Find the segment of the URI byte array which represents the path.
         /// </summary>
@@ -39,7 +41,8 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     if (pathStartIndex == -1)
                     {
                         // e.g. for request lines like: 'GET http://myserver' (no final '/')
-                        pathStartIndex = raw.Length;
+                        // At this point we can return an empty path.
+                        return new ArraySegment<byte>(_emtpyByteArray);
                     }
                 }
                 else
