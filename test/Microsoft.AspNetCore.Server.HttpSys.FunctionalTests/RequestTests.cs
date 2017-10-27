@@ -266,7 +266,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             using (var server = Utilities.CreateHttpServerReturnRoot("/", out root, httpContext =>
             {
                 var requestInfo = httpContext.Features.Get<IHttpRequestFeature>();
-                Assert.Equal("", requestInfo.Path);
+                Assert.Equal("/", requestInfo.Path);
                 return Task.FromResult(0);
             }))
             {

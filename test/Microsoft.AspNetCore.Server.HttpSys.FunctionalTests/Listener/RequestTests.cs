@@ -124,7 +124,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
                 // GET http://localhost:5001 HTTP/1.1
                 var responseTask = SendSocketRequestAsync(root, root);
                 var context = await server.AcceptAsync(Utilities.DefaultTimeout);
-                Assert.Equal("", context.Request.Path);
+                Assert.Equal("/", context.Request.Path);
                 Assert.Equal(root, context.Request.RawUrl);
             }
         }
