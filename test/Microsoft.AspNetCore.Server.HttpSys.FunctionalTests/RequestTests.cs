@@ -259,6 +259,25 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             }
         }
 
+        [ConditionalFact]
+        public async Task Request_FullUriInRequestLine_ParsesPath()
+        {
+            string root;
+            using (var server = Utilities.CreateHttpServerReturnRoot("/", out root, httpContext =>
+            {
+                var requestInfo = httpContext.Features.Get<IHttpRequestFeature>();
+                Assert.Equal("", requestInfo.Path);
+                return Task.FromResult(0);
+            }))
+            {
+                // Send a HTTP request with the request line:
+                // GET http://localhost:5001 HTTP/1.1
+                var response = await SendSocketRequestAsync(root, root);
+                var responseStatusCode = response.Substring(9); // Skip "HTTP/1.1 "
+                Assert.Equal("200", responseStatusCode);
+            }
+        }
+
         [ConditionalTheory]
         // The test server defines these prefixes: "/", "/11", "/2/3", "/2", "/11/2"
         [InlineData("/", "", "/")]
