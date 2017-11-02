@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "Microsoft.AspNetCore.Server.WebListener": "1.0.5",
+    "Microsoft.AspNetCore.Server.WebListener": "1.0.6",
     "Microsoft.Extensions.Logging.Console": "1.0.2"
   },
   "buildOptions": {
