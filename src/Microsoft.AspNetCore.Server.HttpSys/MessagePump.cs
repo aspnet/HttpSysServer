@@ -165,7 +165,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                     {
                         LogHelper.LogException(_logger, "ListenForNextRequestAsync", exception);
                     }
-                    return;
+                    continue;
                 }
                 try
                 {

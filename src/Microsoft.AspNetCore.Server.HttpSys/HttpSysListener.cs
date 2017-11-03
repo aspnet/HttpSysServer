@@ -315,7 +315,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             return true;
         }
 
-        private unsafe void SendError(ulong requestId, int httpStatusCode, IList<string> authChallenges)
+        internal unsafe void SendError(ulong requestId, int httpStatusCode, IList<string> authChallenges = null)
         {
             HttpApi.HTTP_RESPONSE_V2 httpResponse = new HttpApi.HTTP_RESPONSE_V2();
             httpResponse.Response_V1.Version = new HttpApi.HTTP_VERSION();
