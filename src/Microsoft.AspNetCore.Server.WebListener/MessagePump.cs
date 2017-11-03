@@ -127,7 +127,7 @@ namespace Microsoft.AspNetCore.Server.WebListener
                     {
                         LogHelper.LogException(_logger, "ListenForNextRequestAsync", exception);
                     }
-                    return;
+                    continue;
                 }
                 try
                 {
