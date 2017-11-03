@@ -79,6 +79,11 @@ namespace Microsoft.Net.Http.Server
                                 complete = true;
                             }
                         }
+                        catch (Exception)
+                        {
+                            server.SendError(asyncResult._nativeRequestContext.RequestId, HttpStatusCode.BadRequest);
+                            throw;
+                        }
                         finally
                         {
                             if (stoleBlob)
