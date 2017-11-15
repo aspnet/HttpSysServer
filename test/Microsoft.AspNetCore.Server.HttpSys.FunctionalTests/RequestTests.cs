@@ -262,30 +262,28 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         [ConditionalFact]
         public async Task Request_FullUriInRequestLine_ParsesPath()
         {
-            string root;
-            using (var server = Utilities.CreateHttpServerReturnRoot("/", out root, httpContext =>
+            using (var server = Utilities.CreateHttpServerReturnRoot("/", out var root, httpContext =>
             {
                 var requestInfo = httpContext.Features.Get<IHttpRequestFeature>();
                 Assert.Equal("/", requestInfo.Path);
                 Assert.Equal("", requestInfo.PathBase);
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }))
             {
                 // Send a HTTP request with the request line:
                 // GET http://localhost:5001 HTTP/1.1
                 var response = await SendSocketRequestAsync(root, root);
                 var responseStatusCode = response.Substring(9); // Skip "HTTP/1.1 "
-                Assert.Equal("200", responseStatusCode);
+                Assert.Equal(StatusCodes.Status200OK.ToString(), responseStatusCode);
             }
         }
 
         [ConditionalFact]
         public async Task Request_FullUriInRequestLineWithSlashesInQuery_BlockedByHttpSys()
         {
-            string root;
-            using (var server = Utilities.CreateHttpServerReturnRoot("/", out root, httpContext =>
+            using (var server = Utilities.CreateHttpServerReturnRoot("/", out var root, httpContext =>
             {
-                return Task.FromResult(0);
+                return Task.CompletedTask;
             }))
             {
                 // Send a HTTP request with the request line:
@@ -293,7 +291,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 // Should return a 400 as it is a client error
                 var response = await SendSocketRequestAsync(root, root + "?query=value/1/2");
                 var responseStatusCode = response.Substring(9); // Skip "HTTP/1.1 "
-                Assert.Equal("400", responseStatusCode);
+                Assert.Equal(StatusCodes.Status400BadRequest.ToString(), responseStatusCode);
             }
         }
 
