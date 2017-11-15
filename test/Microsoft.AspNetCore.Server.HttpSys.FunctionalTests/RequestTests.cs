@@ -267,6 +267,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             {
                 var requestInfo = httpContext.Features.Get<IHttpRequestFeature>();
                 Assert.Equal("/", requestInfo.Path);
+                Assert.Equal("", requestInfo.PathBase);
                 return Task.FromResult(0);
             }))
             {
@@ -275,6 +276,24 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 var response = await SendSocketRequestAsync(root, root);
                 var responseStatusCode = response.Substring(9); // Skip "HTTP/1.1 "
                 Assert.Equal("200", responseStatusCode);
+            }
+        }
+
+        [ConditionalFact]
+        public async Task Request_FullUriInRequestLineWithSlashesInQuery_BlockedByHttpSys()
+        {
+            string root;
+            using (var server = Utilities.CreateHttpServerReturnRoot("/", out root, httpContext =>
+            {
+                return Task.FromResult(0);
+            }))
+            {
+                // Send a HTTP request with the request line:
+                // GET http://localhost:5001?query=value/1/2 HTTP/1.1
+                // Should return a 400 as it is a client error
+                var response = await SendSocketRequestAsync(root, root + "?query=value/1/2");
+                var responseStatusCode = response.Substring(9); // Skip "HTTP/1.1 "
+                Assert.Equal("400", responseStatusCode);
             }
         }
 
