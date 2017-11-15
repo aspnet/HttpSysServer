@@ -8,7 +8,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 {
     internal static class RawUrlHelper
     {
-        private static byte[] _forwardSlashPath = Encoding.ASCII.GetBytes("/");
+        private static readonly byte[] _forwardSlashPath = Encoding.ASCII.GetBytes("/");
 
         /// <summary>
         /// Find the segment of the URI byte array which represents the path.
