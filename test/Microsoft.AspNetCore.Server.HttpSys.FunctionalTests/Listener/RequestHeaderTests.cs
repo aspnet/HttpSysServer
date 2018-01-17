@@ -93,6 +93,56 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
             }
         }
 
+        [ConditionalFact]
+        public async Task RequestHeaders_ClientSendsKnownHeaderWithNoValue_Success()
+        {
+            string address;
+            using (var server = Utilities.CreateHttpServer(out address))
+            {
+                string[] customValues = new string[] { "" };
+                Task responseTask = SendRequestAsync(address, "If-None-Match", customValues);
+
+                var context = await server.AcceptAsync(Utilities.DefaultTimeout);
+                var requestHeaders = context.Request.Headers;
+                Assert.Equal(3, requestHeaders.Count);
+                Assert.Equal(new Uri(address).Authority, requestHeaders["Host"]);
+                Assert.Equal(new[] { new Uri(address).Authority }, requestHeaders.GetValues("Host"));
+                Assert.Equal("close", requestHeaders["Connection"]);
+                Assert.Equal(new[] { "close" }, requestHeaders.GetValues("Connection"));
+                Assert.Equal(StringValues.Empty, requestHeaders["If-None-Match"]);
+                Assert.Empty(requestHeaders.GetValues("If-None-Match"));
+                Assert.Equal("spacervalue", requestHeaders["Spacer-Header"]);
+                context.Dispose();
+
+                await responseTask;
+            }
+        }
+
+        [ConditionalFact]
+        public async Task RequestHeaders_ClientSendsUnknownHeaderWithNoValue_Success()
+        {
+            string address;
+            using (var server = Utilities.CreateHttpServer(out address))
+            {
+                string[] customValues = new string[] { "" };
+                Task responseTask = SendRequestAsync(address, "Custom-Header", customValues);
+
+                var context = await server.AcceptAsync(Utilities.DefaultTimeout);
+                var requestHeaders = context.Request.Headers;
+                Assert.Equal(4, requestHeaders.Count);
+                Assert.Equal(new Uri(address).Authority, requestHeaders["Host"]);
+                Assert.Equal(new[] { new Uri(address).Authority }, requestHeaders.GetValues("Host"));
+                Assert.Equal("close", requestHeaders["Connection"]);
+                Assert.Equal(new[] { "close" }, requestHeaders.GetValues("Connection"));
+                Assert.Equal("", requestHeaders["Custom-Header"]);
+                Assert.Empty(requestHeaders.GetValues("Custom-Header"));
+                Assert.Equal("spacervalue", requestHeaders["Spacer-Header"]);
+                context.Dispose();
+
+                await responseTask;
+            }
+        }
+
         private async Task<string> SendRequestAsync(string uri)
         {
             using (HttpClient client = new HttpClient())
