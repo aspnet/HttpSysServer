@@ -274,7 +274,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 response.EnsureSuccessStatusCode();
                 var headers = response.Headers;
 
-                if (expectedValue.Count == 0)
+                if (expectedValue.IsNull)
                 {
                     Assert.False(headers.Contains(headerName));
                 }

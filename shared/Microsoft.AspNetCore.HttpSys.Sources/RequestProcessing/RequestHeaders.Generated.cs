@@ -4,11 +4,7 @@
 
 using System;
 using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Primitives;
 
 namespace Microsoft.AspNetCore.HttpSys.Internal
@@ -971,199 +967,199 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                 case 2:
                     if (string.Equals(key, "Te", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Te.Count > 0;
+                        return !Te.IsNull;
                     }
                    break;
                 case 3:
                     if (string.Equals(key, "Via", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Via.Count > 0;
+                        return !Via.IsNull;
                     }
                    break;
                 case 4:
                     if (string.Equals(key, "Date", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Date.Count > 0;
+                        return !Date.IsNull;
                     }
                     if (string.Equals(key, "From", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return From.Count > 0;
+                        return !From.IsNull;
                     }
                     if (string.Equals(key, "Host", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Host.Count > 0;
+                        return !Host.IsNull;
                     }
                    break;
                 case 5:
                     if (string.Equals(key, "Allow", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Allow.Count > 0;
+                        return !Allow.IsNull;
                     }
                     if (string.Equals(key, "Range", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Range.Count > 0;
+                        return !Range.IsNull;
                     }
                    break;
                 case 6:
                     if (string.Equals(key, "Accept", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Accept.Count > 0;
+                        return !Accept.IsNull;
                     }
                     if (string.Equals(key, "Cookie", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Cookie.Count > 0;
+                        return !Cookie.IsNull;
                     }
                     if (string.Equals(key, "Expect", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Expect.Count > 0;
+                        return !Expect.IsNull;
                     }
                     if (string.Equals(key, "Pragma", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Pragma.Count > 0;
+                        return !Pragma.IsNull;
                     }
                    break;
                 case 7:
                     if (string.Equals(key, "Expires", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Expires.Count > 0;
+                        return !Expires.IsNull;
                     }
                     if (string.Equals(key, "Referer", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Referer.Count > 0;
+                        return !Referer.IsNull;
                     }
                     if (string.Equals(key, "Trailer", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Trailer.Count > 0;
+                        return !Trailer.IsNull;
                     }
                     if (string.Equals(key, "Upgrade", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Upgrade.Count > 0;
+                        return !Upgrade.IsNull;
                     }
                     if (string.Equals(key, "Warning", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Warning.Count > 0;
+                        return !Warning.IsNull;
                     }
                    break;
                 case 8:
                     if (string.Equals(key, "If-Match", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return IfMatch.Count > 0;
+                        return !IfMatch.IsNull;
                     }
                     if (string.Equals(key, "If-Range", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return IfRange.Count > 0;
+                        return !IfRange.IsNull;
                     }
                    break;
                 case 9:
                     if (string.Equals(key, "Translate", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Translate.Count > 0;
+                        return !Translate.IsNull;
                     }
                    break;
                 case 10:
                     if (string.Equals(key, "Connection", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Connection.Count > 0;
+                        return !Connection.IsNull;
                     }
                     if (string.Equals(key, "Keep-Alive", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return KeepAlive.Count > 0;
+                        return !KeepAlive.IsNull;
                     }
                     if (string.Equals(key, "User-Agent", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return UserAgent.Count > 0;
+                        return !UserAgent.IsNull;
                     }
                    break;
                 case 11:
                     if (string.Equals(key, "Content-Md5", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ContentMd5.Count > 0;
+                        return !ContentMd5.IsNull;
                     }
                    break;
                 case 12:
                     if (string.Equals(key, "Content-Type", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ContentType.Count > 0;
+                        return !ContentType.IsNull;
                     }
                     if (string.Equals(key, "Max-Forwards", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return MaxForwards.Count > 0;
+                        return !MaxForwards.IsNull;
                     }
                    break;
                 case 13:
                     if (string.Equals(key, "Authorization", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return Authorization.Count > 0;
+                        return !Authorization.IsNull;
                     }
                     if (string.Equals(key, "Cache-Control", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return CacheControl.Count > 0;
+                        return !CacheControl.IsNull;
                     }
                     if (string.Equals(key, "Content-Range", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ContentRange.Count > 0;
+                        return !ContentRange.IsNull;
                     }
                     if (string.Equals(key, "If-None-Match", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return IfNoneMatch.Count > 0;
+                        return !IfNoneMatch.IsNull;
                     }
                     if (string.Equals(key, "Last-Modified", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return LastModified.Count > 0;
+                        return !LastModified.IsNull;
                     }
                    break;
                 case 14:
                     if (string.Equals(key, "Accept-Charset", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return AcceptCharset.Count > 0;
+                        return !AcceptCharset.IsNull;
                     }
                     if (string.Equals(key, "Content-Length", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ContentLength.Count > 0;
+                        return !ContentLength.IsNull;
                     }
                    break;
                 case 15:
                     if (string.Equals(key, "Accept-Encoding", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return AcceptEncoding.Count > 0;
+                        return !AcceptEncoding.IsNull;
                     }
                     if (string.Equals(key, "Accept-Language", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return AcceptLanguage.Count > 0;
+                        return !AcceptLanguage.IsNull;
                     }
                    break;
                 case 16:
                     if (string.Equals(key, "Content-Encoding", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ContentEncoding.Count > 0;
+                        return !ContentEncoding.IsNull;
                     }
                     if (string.Equals(key, "Content-Language", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ContentLanguage.Count > 0;
+                        return !ContentLanguage.IsNull;
                     }
                     if (string.Equals(key, "Content-Location", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ContentLocation.Count > 0;
+                        return !ContentLocation.IsNull;
                     }
                    break;
                 case 17:
                     if (string.Equals(key, "If-Modified-Since", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return IfModifiedSince.Count > 0;
+                        return !IfModifiedSince.IsNull;
                     }
                     if (string.Equals(key, "Transfer-Encoding", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return TransferEncoding.Count > 0;
+                        return !TransferEncoding.IsNull;
                     }
                    break;
                 case 19:
                     if (string.Equals(key, "If-Unmodified-Since", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return IfUnmodifiedSince.Count > 0;
+                        return !IfUnmodifiedSince.IsNull;
                     }
                     if (string.Equals(key, "Proxy-Authorization", StringComparison.OrdinalIgnoreCase)) 
                     {
-                        return ProxyAuthorization.Count > 0;
+                        return !ProxyAuthorization.IsNull;
                     }
                    break;
             }
@@ -1178,239 +1174,239 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     if (string.Equals(key, "Te", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Te;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 3:
                     if (string.Equals(key, "Via", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Via;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 4:
                     if (string.Equals(key, "Date", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Date;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "From", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = From;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Host", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Host;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 5:
                     if (string.Equals(key, "Allow", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Allow;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Range", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Range;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 6:
                     if (string.Equals(key, "Accept", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Accept;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Cookie", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Cookie;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Expect", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Expect;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Pragma", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Pragma;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 7:
                     if (string.Equals(key, "Expires", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Expires;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Referer", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Referer;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Trailer", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Trailer;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Upgrade", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Upgrade;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Warning", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Warning;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 8:
                     if (string.Equals(key, "If-Match", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = IfMatch;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "If-Range", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = IfRange;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 9:
                     if (string.Equals(key, "Translate", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Translate;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 10:
                     if (string.Equals(key, "Connection", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Connection;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Keep-Alive", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = KeepAlive;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "User-Agent", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = UserAgent;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 11:
                     if (string.Equals(key, "Content-Md5", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ContentMd5;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 12:
                     if (string.Equals(key, "Content-Type", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ContentType;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Max-Forwards", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = MaxForwards;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 13:
                     if (string.Equals(key, "Authorization", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = Authorization;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Cache-Control", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = CacheControl;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Content-Range", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ContentRange;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "If-None-Match", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = IfNoneMatch;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Last-Modified", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = LastModified;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 14:
                     if (string.Equals(key, "Accept-Charset", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = AcceptCharset;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Content-Length", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ContentLength;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 15:
                     if (string.Equals(key, "Accept-Encoding", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = AcceptEncoding;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Accept-Language", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = AcceptLanguage;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 16:
                     if (string.Equals(key, "Content-Encoding", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ContentEncoding;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Content-Language", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ContentLanguage;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Content-Location", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ContentLocation;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 17:
                     if (string.Equals(key, "If-Modified-Since", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = IfModifiedSince;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Transfer-Encoding", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = TransferEncoding;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
                 case 19:
                     if (string.Equals(key, "If-Unmodified-Since", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = IfUnmodifiedSince;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                     if (string.Equals(key, "Proxy-Authorization", StringComparison.OrdinalIgnoreCase))
                     {
 					    value = ProxyAuthorization;
-						return value.Count > 0;
+						return !value.IsNull;
                     }
                    break;
             }
@@ -1711,7 +1707,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
             switch (key.Length)
             {
                 case 2:
-                    if (_Te.Count > 0 
+                    if (!_Te.IsNull 
                         && string.Equals(key, "Te", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x2u) != 0);
@@ -1720,7 +1716,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 3:
-                    if (_Via.Count > 0 
+                    if (!_Via.IsNull 
                         && string.Equals(key, "Via", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x80u) != 0);
@@ -1729,21 +1725,21 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 4:
-                    if (_Date.Count > 0 
+                    if (!_Date.IsNull 
                         && string.Equals(key, "Date", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x10000u) != 0);
                         Date = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_From.Count > 0 
+                    if (!_From.IsNull 
                         && string.Equals(key, "From", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x80000u) != 0);
                         From = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Host.Count > 0 
+                    if (!_Host.IsNull 
                         && string.Equals(key, "Host", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x100000u) != 0);
@@ -1752,14 +1748,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 5:
-                    if (_Allow.Count > 0 
+                    if (!_Allow.IsNull 
                         && string.Equals(key, "Allow", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x10u) != 0);
                         Allow = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Range.Count > 0 
+                    if (!_Range.IsNull 
                         && string.Equals(key, "Range", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x80000000u) != 0);
@@ -1768,28 +1764,28 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 6:
-                    if (_Accept.Count > 0 
+                    if (!_Accept.IsNull 
                         && string.Equals(key, "Accept", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x1u) != 0);
                         Accept = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Cookie.Count > 0 
+                    if (!_Cookie.IsNull 
                         && string.Equals(key, "Cookie", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x8000u) != 0);
                         Cookie = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Expect.Count > 0 
+                    if (!_Expect.IsNull 
                         && string.Equals(key, "Expect", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x20000u) != 0);
                         Expect = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Pragma.Count > 0 
+                    if (!_Pragma.IsNull 
                         && string.Equals(key, "Pragma", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x20000000u) != 0);
@@ -1798,35 +1794,35 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 7:
-                    if (_Expires.Count > 0 
+                    if (!_Expires.IsNull 
                         && string.Equals(key, "Expires", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x40000u) != 0);
                         Expires = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Referer.Count > 0 
+                    if (!_Referer.IsNull 
                         && string.Equals(key, "Referer", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x1u) != 0);
                         Referer = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Trailer.Count > 0 
+                    if (!_Trailer.IsNull 
                         && string.Equals(key, "Trailer", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x4u) != 0);
                         Trailer = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Upgrade.Count > 0 
+                    if (!_Upgrade.IsNull 
                         && string.Equals(key, "Upgrade", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x20u) != 0);
                         Upgrade = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_Warning.Count > 0 
+                    if (!_Warning.IsNull 
                         && string.Equals(key, "Warning", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x100u) != 0);
@@ -1835,14 +1831,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 8:
-                    if (_IfMatch.Count > 0 
+                    if (!_IfMatch.IsNull 
                         && string.Equals(key, "If-Match", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x200000u) != 0);
                         IfMatch = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_IfRange.Count > 0 
+                    if (!_IfRange.IsNull 
                         && string.Equals(key, "If-Range", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x1000000u) != 0);
@@ -1851,7 +1847,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 9:
-                    if (_Translate.Count > 0 
+                    if (!_Translate.IsNull 
                         && string.Equals(key, "Translate", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x10u) != 0);
@@ -1860,21 +1856,21 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 10:
-                    if (_Connection.Count > 0 
+                    if (!_Connection.IsNull 
                         && string.Equals(key, "Connection", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x80u) != 0);
                         Connection = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_KeepAlive.Count > 0 
+                    if (!_KeepAlive.IsNull 
                         && string.Equals(key, "Keep-Alive", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x4000000u) != 0);
                         KeepAlive = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_UserAgent.Count > 0 
+                    if (!_UserAgent.IsNull 
                         && string.Equals(key, "User-Agent", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x40u) != 0);
@@ -1883,7 +1879,7 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 11:
-                    if (_ContentMd5.Count > 0 
+                    if (!_ContentMd5.IsNull 
                         && string.Equals(key, "Content-Md5", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x1000u) != 0);
@@ -1892,14 +1888,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 12:
-                    if (_ContentType.Count > 0 
+                    if (!_ContentType.IsNull 
                         && string.Equals(key, "Content-Type", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x4000u) != 0);
                         ContentType = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_MaxForwards.Count > 0 
+                    if (!_MaxForwards.IsNull 
                         && string.Equals(key, "Max-Forwards", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x10000000u) != 0);
@@ -1908,35 +1904,35 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 13:
-                    if (_Authorization.Count > 0 
+                    if (!_Authorization.IsNull 
                         && string.Equals(key, "Authorization", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x20u) != 0);
                         Authorization = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_CacheControl.Count > 0 
+                    if (!_CacheControl.IsNull 
                         && string.Equals(key, "Cache-Control", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x40u) != 0);
                         CacheControl = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_ContentRange.Count > 0 
+                    if (!_ContentRange.IsNull 
                         && string.Equals(key, "Content-Range", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x2000u) != 0);
                         ContentRange = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_IfNoneMatch.Count > 0 
+                    if (!_IfNoneMatch.IsNull 
                         && string.Equals(key, "If-None-Match", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x800000u) != 0);
                         IfNoneMatch = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_LastModified.Count > 0 
+                    if (!_LastModified.IsNull 
                         && string.Equals(key, "Last-Modified", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x8000000u) != 0);
@@ -1945,14 +1941,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 14:
-                    if (_AcceptCharset.Count > 0 
+                    if (!_AcceptCharset.IsNull 
                         && string.Equals(key, "Accept-Charset", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x2u) != 0);
                         AcceptCharset = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_ContentLength.Count > 0 
+                    if (!_ContentLength.IsNull 
                         && string.Equals(key, "Content-Length", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x400u) != 0);
@@ -1961,14 +1957,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 15:
-                    if (_AcceptEncoding.Count > 0 
+                    if (!_AcceptEncoding.IsNull 
                         && string.Equals(key, "Accept-Encoding", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x4u) != 0);
                         AcceptEncoding = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_AcceptLanguage.Count > 0 
+                    if (!_AcceptLanguage.IsNull 
                         && string.Equals(key, "Accept-Language", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x8u) != 0);
@@ -1977,21 +1973,21 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 16:
-                    if (_ContentEncoding.Count > 0 
+                    if (!_ContentEncoding.IsNull 
                         && string.Equals(key, "Content-Encoding", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x100u) != 0);
                         ContentEncoding = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_ContentLanguage.Count > 0 
+                    if (!_ContentLanguage.IsNull 
                         && string.Equals(key, "Content-Language", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x200u) != 0);
                         ContentLanguage = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_ContentLocation.Count > 0 
+                    if (!_ContentLocation.IsNull 
                         && string.Equals(key, "Content-Location", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x800u) != 0);
@@ -2000,14 +1996,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 17:
-                    if (_IfModifiedSince.Count > 0 
+                    if (!_IfModifiedSince.IsNull 
                         && string.Equals(key, "If-Modified-Since", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x400000u) != 0);
                         IfModifiedSince = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_TransferEncoding.Count > 0 
+                    if (!_TransferEncoding.IsNull 
                         && string.Equals(key, "Transfer-Encoding", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag1 & 0x8u) != 0);
@@ -2016,14 +2012,14 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
                     }
                    break;
                 case 19:
-                    if (_IfUnmodifiedSince.Count > 0 
+                    if (!_IfUnmodifiedSince.IsNull 
                         && string.Equals(key, "If-Unmodified-Since", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x2000000u) != 0);
                         IfUnmodifiedSince = StringValues.Empty;
                         return wasSet;
                     }
-                    if (_ProxyAuthorization.Count > 0 
+                    if (!_ProxyAuthorization.IsNull 
                         && string.Equals(key, "Proxy-Authorization", StringComparison.Ordinal))
                     {
 					    bool wasSet = ((_flag0 & 0x40000000u) != 0);
@@ -2037,167 +2033,167 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         private IEnumerable<string> PropertiesKeys()
         {
-            if (Accept.Count > 0)
+            if (!Accept.IsNull)
             {
                 yield return "Accept";
             }
-            if (AcceptCharset.Count > 0)
+            if (!AcceptCharset.IsNull)
             {
                 yield return "Accept-Charset";
             }
-            if (AcceptEncoding.Count > 0)
+            if (!AcceptEncoding.IsNull)
             {
                 yield return "Accept-Encoding";
             }
-            if (AcceptLanguage.Count > 0)
+            if (!AcceptLanguage.IsNull)
             {
                 yield return "Accept-Language";
             }
-            if (Allow.Count > 0)
+            if (!Allow.IsNull)
             {
                 yield return "Allow";
             }
-            if (Authorization.Count > 0)
+            if (!Authorization.IsNull)
             {
                 yield return "Authorization";
             }
-            if (CacheControl.Count > 0)
+            if (!CacheControl.IsNull)
             {
                 yield return "Cache-Control";
             }
-            if (Connection.Count > 0)
+            if (!Connection.IsNull)
             {
                 yield return "Connection";
             }
-            if (ContentEncoding.Count > 0)
+            if (!ContentEncoding.IsNull)
             {
                 yield return "Content-Encoding";
             }
-            if (ContentLanguage.Count > 0)
+            if (!ContentLanguage.IsNull)
             {
                 yield return "Content-Language";
             }
-            if (ContentLength.Count > 0)
+            if (!ContentLength.IsNull)
             {
                 yield return "Content-Length";
             }
-            if (ContentLocation.Count > 0)
+            if (!ContentLocation.IsNull)
             {
                 yield return "Content-Location";
             }
-            if (ContentMd5.Count > 0)
+            if (!ContentMd5.IsNull)
             {
                 yield return "Content-Md5";
             }
-            if (ContentRange.Count > 0)
+            if (!ContentRange.IsNull)
             {
                 yield return "Content-Range";
             }
-            if (ContentType.Count > 0)
+            if (!ContentType.IsNull)
             {
                 yield return "Content-Type";
             }
-            if (Cookie.Count > 0)
+            if (!Cookie.IsNull)
             {
                 yield return "Cookie";
             }
-            if (Date.Count > 0)
+            if (!Date.IsNull)
             {
                 yield return "Date";
             }
-            if (Expect.Count > 0)
+            if (!Expect.IsNull)
             {
                 yield return "Expect";
             }
-            if (Expires.Count > 0)
+            if (!Expires.IsNull)
             {
                 yield return "Expires";
             }
-            if (From.Count > 0)
+            if (!From.IsNull)
             {
                 yield return "From";
             }
-            if (Host.Count > 0)
+            if (!Host.IsNull)
             {
                 yield return "Host";
             }
-            if (IfMatch.Count > 0)
+            if (!IfMatch.IsNull)
             {
                 yield return "If-Match";
             }
-            if (IfModifiedSince.Count > 0)
+            if (!IfModifiedSince.IsNull)
             {
                 yield return "If-Modified-Since";
             }
-            if (IfNoneMatch.Count > 0)
+            if (!IfNoneMatch.IsNull)
             {
                 yield return "If-None-Match";
             }
-            if (IfRange.Count > 0)
+            if (!IfRange.IsNull)
             {
                 yield return "If-Range";
             }
-            if (IfUnmodifiedSince.Count > 0)
+            if (!IfUnmodifiedSince.IsNull)
             {
                 yield return "If-Unmodified-Since";
             }
-            if (KeepAlive.Count > 0)
+            if (!KeepAlive.IsNull)
             {
                 yield return "Keep-Alive";
             }
-            if (LastModified.Count > 0)
+            if (!LastModified.IsNull)
             {
                 yield return "Last-Modified";
             }
-            if (MaxForwards.Count > 0)
+            if (!MaxForwards.IsNull)
             {
                 yield return "Max-Forwards";
             }
-            if (Pragma.Count > 0)
+            if (!Pragma.IsNull)
             {
                 yield return "Pragma";
             }
-            if (ProxyAuthorization.Count > 0)
+            if (!ProxyAuthorization.IsNull)
             {
                 yield return "Proxy-Authorization";
             }
-            if (Range.Count > 0)
+            if (!Range.IsNull)
             {
                 yield return "Range";
             }
-            if (Referer.Count > 0)
+            if (!Referer.IsNull)
             {
                 yield return "Referer";
             }
-            if (Te.Count > 0)
+            if (!Te.IsNull)
             {
                 yield return "Te";
             }
-            if (Trailer.Count > 0)
+            if (!Trailer.IsNull)
             {
                 yield return "Trailer";
             }
-            if (TransferEncoding.Count > 0)
+            if (!TransferEncoding.IsNull)
             {
                 yield return "Transfer-Encoding";
             }
-            if (Translate.Count > 0)
+            if (!Translate.IsNull)
             {
                 yield return "Translate";
             }
-            if (Upgrade.Count > 0)
+            if (!Upgrade.IsNull)
             {
                 yield return "Upgrade";
             }
-            if (UserAgent.Count > 0)
+            if (!UserAgent.IsNull)
             {
                 yield return "User-Agent";
             }
-            if (Via.Count > 0)
+            if (!Via.IsNull)
             {
                 yield return "Via";
             }
-            if (Warning.Count > 0)
+            if (!Warning.IsNull)
             {
                 yield return "Warning";
             }
@@ -2205,167 +2201,167 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         private IEnumerable<StringValues> PropertiesValues()
         {
-            if (Accept.Count > 0)
+            if (!Accept.IsNull)
             {
                 yield return Accept;
             }
-            if (AcceptCharset.Count > 0)
+            if (!AcceptCharset.IsNull)
             {
                 yield return AcceptCharset;
             }
-            if (AcceptEncoding.Count > 0)
+            if (!AcceptEncoding.IsNull)
             {
                 yield return AcceptEncoding;
             }
-            if (AcceptLanguage.Count > 0)
+            if (!AcceptLanguage.IsNull)
             {
                 yield return AcceptLanguage;
             }
-            if (Allow.Count > 0)
+            if (!Allow.IsNull)
             {
                 yield return Allow;
             }
-            if (Authorization.Count > 0)
+            if (!Authorization.IsNull)
             {
                 yield return Authorization;
             }
-            if (CacheControl.Count > 0)
+            if (!CacheControl.IsNull)
             {
                 yield return CacheControl;
             }
-            if (Connection.Count > 0)
+            if (!Connection.IsNull)
             {
                 yield return Connection;
             }
-            if (ContentEncoding.Count > 0)
+            if (!ContentEncoding.IsNull)
             {
                 yield return ContentEncoding;
             }
-            if (ContentLanguage.Count > 0)
+            if (!ContentLanguage.IsNull)
             {
                 yield return ContentLanguage;
             }
-            if (ContentLength.Count > 0)
+            if (!ContentLength.IsNull)
             {
                 yield return ContentLength;
             }
-            if (ContentLocation.Count > 0)
+            if (!ContentLocation.IsNull)
             {
                 yield return ContentLocation;
             }
-            if (ContentMd5.Count > 0)
+            if (!ContentMd5.IsNull)
             {
                 yield return ContentMd5;
             }
-            if (ContentRange.Count > 0)
+            if (!ContentRange.IsNull)
             {
                 yield return ContentRange;
             }
-            if (ContentType.Count > 0)
+            if (!ContentType.IsNull)
             {
                 yield return ContentType;
             }
-            if (Cookie.Count > 0)
+            if (!Cookie.IsNull)
             {
                 yield return Cookie;
             }
-            if (Date.Count > 0)
+            if (!Date.IsNull)
             {
                 yield return Date;
             }
-            if (Expect.Count > 0)
+            if (!Expect.IsNull)
             {
                 yield return Expect;
             }
-            if (Expires.Count > 0)
+            if (!Expires.IsNull)
             {
                 yield return Expires;
             }
-            if (From.Count > 0)
+            if (!From.IsNull)
             {
                 yield return From;
             }
-            if (Host.Count > 0)
+            if (!Host.IsNull)
             {
                 yield return Host;
             }
-            if (IfMatch.Count > 0)
+            if (!IfMatch.IsNull)
             {
                 yield return IfMatch;
             }
-            if (IfModifiedSince.Count > 0)
+            if (!IfModifiedSince.IsNull)
             {
                 yield return IfModifiedSince;
             }
-            if (IfNoneMatch.Count > 0)
+            if (!IfNoneMatch.IsNull)
             {
                 yield return IfNoneMatch;
             }
-            if (IfRange.Count > 0)
+            if (!IfRange.IsNull)
             {
                 yield return IfRange;
             }
-            if (IfUnmodifiedSince.Count > 0)
+            if (!IfUnmodifiedSince.IsNull)
             {
                 yield return IfUnmodifiedSince;
             }
-            if (KeepAlive.Count > 0)
+            if (!KeepAlive.IsNull)
             {
                 yield return KeepAlive;
             }
-            if (LastModified.Count > 0)
+            if (!LastModified.IsNull)
             {
                 yield return LastModified;
             }
-            if (MaxForwards.Count > 0)
+            if (!MaxForwards.IsNull)
             {
                 yield return MaxForwards;
             }
-            if (Pragma.Count > 0)
+            if (!Pragma.IsNull)
             {
                 yield return Pragma;
             }
-            if (ProxyAuthorization.Count > 0)
+            if (!ProxyAuthorization.IsNull)
             {
                 yield return ProxyAuthorization;
             }
-            if (Range.Count > 0)
+            if (!Range.IsNull)
             {
                 yield return Range;
             }
-            if (Referer.Count > 0)
+            if (!Referer.IsNull)
             {
                 yield return Referer;
             }
-            if (Te.Count > 0)
+            if (!Te.IsNull)
             {
                 yield return Te;
             }
-            if (Trailer.Count > 0)
+            if (!Trailer.IsNull)
             {
                 yield return Trailer;
             }
-            if (TransferEncoding.Count > 0)
+            if (!TransferEncoding.IsNull)
             {
                 yield return TransferEncoding;
             }
-            if (Translate.Count > 0)
+            if (!Translate.IsNull)
             {
                 yield return Translate;
             }
-            if (Upgrade.Count > 0)
+            if (!Upgrade.IsNull)
             {
                 yield return Upgrade;
             }
-            if (UserAgent.Count > 0)
+            if (!UserAgent.IsNull)
             {
                 yield return UserAgent;
             }
-            if (Via.Count > 0)
+            if (!Via.IsNull)
             {
                 yield return Via;
             }
-            if (Warning.Count > 0)
+            if (!Warning.IsNull)
             {
                 yield return Warning;
             }
@@ -2373,167 +2369,167 @@ namespace Microsoft.AspNetCore.HttpSys.Internal
 
         private IEnumerable<KeyValuePair<string, StringValues>> PropertiesEnumerable()
         {
-            if (Accept.Count > 0)
+            if (!Accept.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Accept", Accept);
             }
-            if (AcceptCharset.Count > 0)
+            if (!AcceptCharset.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Accept-Charset", AcceptCharset);
             }
-            if (AcceptEncoding.Count > 0)
+            if (!AcceptEncoding.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Accept-Encoding", AcceptEncoding);
             }
-            if (AcceptLanguage.Count > 0)
+            if (!AcceptLanguage.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Accept-Language", AcceptLanguage);
             }
-            if (Allow.Count > 0)
+            if (!Allow.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Allow", Allow);
             }
-            if (Authorization.Count > 0)
+            if (!Authorization.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Authorization", Authorization);
             }
-            if (CacheControl.Count > 0)
+            if (!CacheControl.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Cache-Control", CacheControl);
             }
-            if (Connection.Count > 0)
+            if (!Connection.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Connection", Connection);
             }
-            if (ContentEncoding.Count > 0)
+            if (!ContentEncoding.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Content-Encoding", ContentEncoding);
             }
-            if (ContentLanguage.Count > 0)
+            if (!ContentLanguage.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Content-Language", ContentLanguage);
             }
-            if (ContentLength.Count > 0)
+            if (!ContentLength.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Content-Length", ContentLength);
             }
-            if (ContentLocation.Count > 0)
+            if (!ContentLocation.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Content-Location", ContentLocation);
             }
-            if (ContentMd5.Count > 0)
+            if (!ContentMd5.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Content-Md5", ContentMd5);
             }
-            if (ContentRange.Count > 0)
+            if (!ContentRange.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Content-Range", ContentRange);
             }
-            if (ContentType.Count > 0)
+            if (!ContentType.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Content-Type", ContentType);
             }
-            if (Cookie.Count > 0)
+            if (!Cookie.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Cookie", Cookie);
             }
-            if (Date.Count > 0)
+            if (!Date.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Date", Date);
             }
-            if (Expect.Count > 0)
+            if (!Expect.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Expect", Expect);
             }
-            if (Expires.Count > 0)
+            if (!Expires.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Expires", Expires);
             }
-            if (From.Count > 0)
+            if (!From.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("From", From);
             }
-            if (Host.Count > 0)
+            if (!Host.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Host", Host);
             }
-            if (IfMatch.Count > 0)
+            if (!IfMatch.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("If-Match", IfMatch);
             }
-            if (IfModifiedSince.Count > 0)
+            if (!IfModifiedSince.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("If-Modified-Since", IfModifiedSince);
             }
-            if (IfNoneMatch.Count > 0)
+            if (!IfNoneMatch.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("If-None-Match", IfNoneMatch);
             }
-            if (IfRange.Count > 0)
+            if (!IfRange.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("If-Range", IfRange);
             }
-            if (IfUnmodifiedSince.Count > 0)
+            if (!IfUnmodifiedSince.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("If-Unmodified-Since", IfUnmodifiedSince);
             }
-            if (KeepAlive.Count > 0)
+            if (!KeepAlive.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Keep-Alive", KeepAlive);
             }
-            if (LastModified.Count > 0)
+            if (!LastModified.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Last-Modified", LastModified);
             }
-            if (MaxForwards.Count > 0)
+            if (!MaxForwards.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Max-Forwards", MaxForwards);
             }
-            if (Pragma.Count > 0)
+            if (!Pragma.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Pragma", Pragma);
             }
-            if (ProxyAuthorization.Count > 0)
+            if (!ProxyAuthorization.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Proxy-Authorization", ProxyAuthorization);
             }
-            if (Range.Count > 0)
+            if (!Range.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Range", Range);
             }
-            if (Referer.Count > 0)
+            if (!Referer.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Referer", Referer);
             }
-            if (Te.Count > 0)
+            if (!Te.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Te", Te);
             }
-            if (Trailer.Count > 0)
+            if (!Trailer.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Trailer", Trailer);
             }
-            if (TransferEncoding.Count > 0)
+            if (!TransferEncoding.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Transfer-Encoding", TransferEncoding);
             }
-            if (Translate.Count > 0)
+            if (!Translate.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Translate", Translate);
             }
-            if (Upgrade.Count > 0)
+            if (!Upgrade.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Upgrade", Upgrade);
             }
-            if (UserAgent.Count > 0)
+            if (!UserAgent.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("User-Agent", UserAgent);
             }
-            if (Via.Count > 0)
+            if (!Via.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Via", Via);
             }
-            if (Warning.Count > 0)
+            if (!Warning.IsNull)
             {
                 yield return new KeyValuePair<string, StringValues>("Warning", Warning);
             }
