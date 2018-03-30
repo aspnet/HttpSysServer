@@ -43,6 +43,8 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
         internal bool ThrowWriteExceptions => RequestContext.Server.Options.ThrowWriteExceptions;
 
+        internal bool EnableKernelResponseBuffering => RequestContext.Server.Options.EnableKernelResponseBuffering;
+
         internal bool IsDisposed => _disposed;
 
         public override bool CanSeek
@@ -436,6 +438,10 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             else if (!endOfRequest && _leftToWrite != writeCount)
             {
                 flags |= HttpApiTypes.HTTP_FLAGS.HTTP_SEND_RESPONSE_FLAG_MORE_DATA;
+                if (EnableKernelResponseBuffering)
+                {
+                    flags |= HttpApiTypes.HTTP_FLAGS.HTTP_SEND_RESPONSE_FLAG_BUFFER_DATA;
+                }
             }
 
             // Update _leftToWrite now so we can queue up additional async writes.
