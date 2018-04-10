@@ -246,6 +246,23 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         }
 
         [ConditionalFact]
+        public async Task Server_SetRejectionVerbosityLevel_Success()
+        {
+            string address;
+            using (var server = Utilities.CreateHttpServer(out address))
+            {
+                server.Options.Http503ResponseVerbosityLevel = Http503ResponseVerbosityLevel.Limited;
+                var responseTask = SendRequestAsync(address);
+
+                var context = await server.AcceptAsync(Utilities.DefaultTimeout);
+                context.Dispose();
+
+                var response = await responseTask;
+                Assert.Equal(string.Empty, response);
+            }
+        }
+
+        [ConditionalFact]
         public async Task Server_HotAddPrefix_Success()
         {
             string address;

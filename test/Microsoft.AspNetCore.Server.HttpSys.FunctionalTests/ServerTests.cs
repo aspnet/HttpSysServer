@@ -299,6 +299,25 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         }
 
         [ConditionalFact]
+        public async Task Server_SetRejectionVerbosityLevel_Success()
+        {
+            // This is just to get a dynamic port
+            string address;
+            using (Utilities.CreateHttpServer(out address, httpContext => Task.FromResult(0))) { }
+
+            var server = Utilities.CreatePump();
+            server.Listener.Options.UrlPrefixes.Add(UrlPrefix.Create(address));
+            server.Listener.Options.Http503ResponseVerbosityLevel = Http503ResponseVerbosityLevel.Limited;
+
+            using (server)
+            {
+                await server.StartAsync(new DummyApplication(), CancellationToken.None);
+                string response = await SendRequestAsync(address);
+                Assert.Equal(string.Empty, response);
+            }
+        }
+
+        [ConditionalFact]
         public void Server_SetConnectionLimitArgumentValidation_Success()
         {
             var server = Utilities.CreatePump();
