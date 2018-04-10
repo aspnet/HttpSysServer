@@ -9,14 +9,14 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 {
     public class HttpSysOptions
     {
-        private const long DefaultRejectionVerbosityLevel = (long)Http503ResponseVerbosityLevel.Basic; // Http.sys default.
+        private const Http503VerbosityLevel DefaultRejectionVerbosityLevel = Http503VerbosityLevel.Basic; // Http.sys default.
         private const long DefaultRequestQueueLength = 1000; // Http.sys default.
         internal static readonly int DefaultMaxAccepts = 5 * Environment.ProcessorCount;
         // Matches the default maxAllowedContentLength in IIS (~28.6 MB)
         // https://www.iis.net/configreference/system.webserver/security/requestfiltering/requestlimits#005
         private const long DefaultMaxRequestBodySize = 30000000;
 
-        private long _rejectionVebosityLevel = DefaultRejectionVerbosityLevel;
+        private Http503VerbosityLevel _rejectionVebosityLevel = DefaultRejectionVerbosityLevel;
         // The native request queue
         private long _requestQueueLength = DefaultRequestQueueLength;
         private long? _maxConnections;
@@ -145,30 +145,30 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         /// queue limit is reached. The default in http.sys is "Basic" which means http.sys is just resetting the TCP connection. IIS uses Limited
         /// as its default behavior which will result in sending back a 503 - Service Unavailable back to the client.
         /// </summary>
-        public Http503ResponseVerbosityLevel Http503ResponseVerbosityLevel
+        public Http503VerbosityLevel Http503Verbosity
         {
             get
             {
-                return (Http503ResponseVerbosityLevel)_rejectionVebosityLevel;
+                return _rejectionVebosityLevel;
             }
             set
             {
-                if (value < Http503ResponseVerbosityLevel.Basic || value > Http503ResponseVerbosityLevel.Full)
+                if (value < Http503VerbosityLevel.Basic || value > Http503VerbosityLevel.Full)
                 {
                     string message = String.Format(
                         CultureInfo.InvariantCulture,
                         "The value must be one of the values defined in the '{0}' enum.",
-                        typeof(Http503ResponseVerbosityLevel).Name);
+                        typeof(Http503VerbosityLevel).Name);
 
                     throw new ArgumentOutOfRangeException(nameof(value), value, message);
                 }
 
                 if (_requestQueue != null)
                 {
-                    _requestQueue.SetRejectionVerbosity((long)value);
+                    _requestQueue.SetRejectionVerbosity(value);
                 }
                 // Only store it if it succeeds or hasn't started yet
-                _rejectionVebosityLevel = (long)value;
+                _rejectionVebosityLevel = value;
             }
         }
 

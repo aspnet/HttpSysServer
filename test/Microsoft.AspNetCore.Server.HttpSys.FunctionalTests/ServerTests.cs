@@ -307,7 +307,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
             var server = Utilities.CreatePump();
             server.Listener.Options.UrlPrefixes.Add(UrlPrefix.Create(address));
-            server.Listener.Options.Http503ResponseVerbosityLevel = Http503ResponseVerbosityLevel.Limited;
+            server.Listener.Options.Http503Verbosity = Http503VerbosityLevel.Limited;
 
             using (server)
             {

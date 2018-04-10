@@ -248,10 +248,9 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         [ConditionalFact]
         public async Task Server_SetRejectionVerbosityLevel_Success()
         {
-            string address;
-            using (var server = Utilities.CreateHttpServer(out address))
+            using (var server = Utilities.CreateHttpServer(out string address))
             {
-                server.Options.Http503ResponseVerbosityLevel = Http503ResponseVerbosityLevel.Limited;
+                server.Options.Http503Verbosity = Http503VerbosityLevel.Limited;
                 var responseTask = SendRequestAsync(address);
 
                 var context = await server.AcceptAsync(Utilities.DefaultTimeout);

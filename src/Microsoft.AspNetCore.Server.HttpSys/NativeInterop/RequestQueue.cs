@@ -100,7 +100,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
         }
 
         // The listener must be active for this to work.
-        internal unsafe void SetRejectionVerbosity(long verbosity)
+        internal unsafe void SetRejectionVerbosity(Http503VerbosityLevel verbosity)
         {
             CheckDisposed();
 
