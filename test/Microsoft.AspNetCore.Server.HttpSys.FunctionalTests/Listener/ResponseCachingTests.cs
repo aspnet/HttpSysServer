@@ -537,6 +537,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys.Listener
         }
 
         [ConditionalFact]
+        [OSSkipCondition(OperatingSystems.Windows, WindowsVersions.Win7, WindowsVersions.Win2008R2, SkipReason = "Managed Socket or SocketHttpHandler issue: https://github.com/dotnet/corefx/issues/30691")]
         public async Task Caching_SetTtlAndStatusCode_Cached()
         {
             string address;
