@@ -448,7 +448,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
             int numKnownMultiHeaders = 0;
             foreach (var headerPair in Headers)
             {
-                if (headerPair.Value.Count == 0)
+                if (headerPair.Value.IsNull)
                 {
                     continue;
                 }
@@ -474,7 +474,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 {
                     foreach (var headerPair in Headers)
                     {
-                        if (headerPair.Value.Count == 0)
+                        if (headerPair.Value.IsNull)
                         {
                             continue;
                         }

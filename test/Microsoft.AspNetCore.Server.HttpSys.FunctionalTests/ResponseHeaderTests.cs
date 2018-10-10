@@ -274,7 +274,7 @@ namespace Microsoft.AspNetCore.Server.HttpSys
                 response.EnsureSuccessStatusCode();
                 var headers = response.Headers;
 
-                if (expectedValue.Count == 0)
+                if (expectedValue.IsNull)
                 {
                     Assert.False(headers.Contains(headerName));
                 }
@@ -294,10 +294,11 @@ namespace Microsoft.AspNetCore.Server.HttpSys
 
                 // Unknown headers
                 dataset.Add("NullString", (string)null, (string)null);
-                dataset.Add("EmptyString", "", "");
-                dataset.Add("NullStringArray", new string[] { null }, "");
-                dataset.Add("EmptyStringArray", new string[] { "" }, "");
-                dataset.Add("MixedStringArray", new string[] { null, "" }, new string[] { "", "" });
+                dataset.Add("EmptyString", "", (string)null);
+                dataset.Add("NullStringArray", new string[] { null }, (string)null);
+                dataset.Add("EmptyStringArray", new string[] { "" }, (string)null);
+                dataset.Add("ActualValueArray", new string[] { "a" }, "a");
+                dataset.Add("MixedStringArray", new string[] { null, "" }, (string)null);
                 // Known headers
                 dataset.Add("Location", (string)null, (string)null);
                 dataset.Add("Location", "", (string)null);
