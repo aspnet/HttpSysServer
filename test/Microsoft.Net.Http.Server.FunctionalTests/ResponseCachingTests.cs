@@ -13,7 +13,7 @@ using Xunit;
 namespace Microsoft.Net.Http.Server
 {
     // Skipping since tests are flaky on CI
-    private class ResponseCachingTests
+    class ResponseCachingTests
     {
         private readonly string _absoluteFilePath;
         private readonly long _fileLength;
